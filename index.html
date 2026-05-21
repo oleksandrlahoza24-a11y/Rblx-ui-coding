@@ -968,6 +968,227 @@
       transition: opacity 0.4s ease;
     }
 
+    /* ── GALLERY OVERLAY ── */
+    #gallery-overlay {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s ease;
+    }
+
+    #gallery-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    #gallery-track {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      touch-action: pan-y;
+    }
+
+    #gallery-img {
+      max-width: 100%;
+      max-height: 82vh;
+      object-fit: contain;
+      border-radius: 6px;
+      user-select: none;
+      transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.22s ease;
+    }
+
+    #gallery-img.slide-left {
+      animation: gSlideLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    #gallery-img.slide-right {
+      animation: gSlideRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    @keyframes gSlideLeft {
+      from {
+        opacity: 0;
+        transform: translateX(60px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    @keyframes gSlideRight {
+      from {
+        opacity: 0;
+        transform: translateX(-60px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    #gallery-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 52px 22px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.75), transparent);
+      z-index: 2;
+    }
+
+    #gallery-counter {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.6);
+      letter-spacing: 0.14em;
+    }
+
+    #gallery-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--panel-border);
+      color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    #gallery-close:active {
+      transform: scale(0.88) rotate(90deg);
+    }
+
+    #gallery-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 24px 28px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+      z-index: 2;
+    }
+
+    .gal-btn {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: rgba(255, 255, 255, 0.7);
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--panel-border);
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.15s ease;
+      backdrop-filter: blur(12px);
+    }
+
+    #gal-prev:active {
+      transform: translateX(-4px) scale(0.92);
+    }
+
+    #gal-next:active {
+      transform: translateX(4px) scale(0.92);
+    }
+
+    #gal-save:active {
+      transform: translateY(-4px) scale(1.05);
+      color: var(--amber);
+    }
+
+    #gal-delete:active {
+      transform: scale(0.88);
+      color: var(--red);
+    }
+
+    #gal-save {
+      color: var(--amber);
+      border-color: var(--amber-glow);
+    }
+
+    #gal-delete {
+      color: rgba(255, 80, 80, 0.7);
+    }
+
+    /* ── VIDEO REC BADGE ── */
+    #rec-badge {
+      position: absolute;
+      top: 52px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      color: #fff;
+      background: rgba(210, 0, 0, 0.85);
+      padding: 5px 14px;
+      border-radius: 20px;
+      z-index: 12;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    #rec-badge.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    #rec-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #fff;
+      animation: rec-blink 1s ease infinite;
+    }
+
+    @keyframes rec-blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.2;
+      }
+    }
+
+    /* ── AA PILL ── */
+    #aa-btn {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+    }
+
     .hidden {
       display: none !important;
     }
@@ -1019,8 +1240,15 @@
         </svg><span id="timer-label">OFF</span>
       </div>
       <div class="top-pill" id="quality-btn">PNG</div>
+      <div class="top-pill" id="aa-btn">AA</div>
     </div>
     <div id="photo-counter"><span id="count-num">0</span> SHOTS</div>
+  </div>
+
+  <!-- REC BADGE -->
+  <div id="rec-badge">
+    <div id="rec-dot"></div>
+    <span id="rec-time">0:00</span>
   </div>
 
   <div id="kbd-hint">SPACE · CAPTURE</div>
@@ -1083,6 +1311,41 @@
     <span id="expo-label">0.0</span>
   </div>
 
+  <!-- GALLERY OVERLAY -->
+  <div id="gallery-overlay">
+    <div id="gallery-top">
+      <span id="gallery-counter">1 / 1</span>
+      <div id="gallery-close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </div>
+    </div>
+    <div id="gallery-track">
+      <img id="gallery-img" src="" alt="">
+    </div>
+    <div id="gallery-bar">
+      <button class="gal-btn" id="gal-prev">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        PREV
+      </button>
+      <button class="gal-btn" id="gal-delete">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        DEL
+      </button>
+      <button class="gal-btn" id="gal-save">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        SAVE
+      </button>
+      <button class="gal-btn" id="gal-next">
+        NEXT
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+
   <!-- REVIEW OVERLAY -->
   <div id="review-overlay">
     <img id="review-img" src="" alt="Last photo">
@@ -1101,7 +1364,13 @@
   <!-- BOTTOM BAR -->
   <div id="bottom-bar">
     <div id="mode-strip">
-      <div class="mode-tab" data-mode="video">VIDEO</div>
+      <div class="mode-tab" data-mode="video">
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"
+          style="display:inline;vertical-align:middle;margin-right:3px">
+          <circle cx="12" cy="12" r="10" />
+          <polygon points="10,8 16,12 10,16" fill="#000" />
+        </svg>VIDEO
+      </div>
       <div class="mode-tab active" data-mode="photo">PHOTO</div>
       <div class="mode-tab" data-mode="portrait">PORTRAIT</div>
       <div class="mode-tab" data-mode="dynamic">
@@ -1134,62 +1403,82 @@
   <script>
     'use strict';
 
-  // ── DOM REFS (single lookup) ──
+  // ── DOM REFS ──
   const $ = id => document.getElementById(id);
-  const viewfinder     = $('viewfinder');
-  const photoCanvas    = $('photoCanvas');
-  const captureBtn     = $('captureBtn');
-  const switchCameraBtn= $('switchCameraBtn');
-  const galleryPreview = $('galleryPreview');
-  const flash          = $('flash');
-  const overlay        = $('overlay');
-  const startCameraBtn = $('startCameraBtn');
-  const gridOverlay    = $('grid-overlay');
-  const gridBtn        = $('grid-btn');
-  const ratioBtn       = $('ratio-btn');
-  const timerBtn       = $('timer-btn');
-  const timerLabel     = $('timer-label');
-  const timerDisplay   = $('timer-display');
-  const maskTop        = $('aspect-mask-top');
-  const maskBottom     = $('aspect-mask-bottom');
-  const zoomBar        = $('zoom-bar');
-  const zoomSlider     = $('zoom-slider');
-  const zoomLabel      = $('zoom-label');
-  const focusRing      = $('focus-ring');
-  const aeLockBadge    = $('ae-lock-badge');
-  const aeBtn          = $('ae-btn');
-  const torchBtn       = $('torch-btn');
-  const expoBtn        = $('expo-btn');
-  const expoBar        = $('expo-bar');
-  const expoSlider     = $('expo-slider');
-  const expoLabelEl    = $('expo-label');
-  const countNum       = $('count-num');
-  const countBadge     = $('photo-count-badge');
-  const reviewOverlay  = $('review-overlay');
-  const reviewImg      = $('review-img');
-  const closeReviewBtn = $('close-review-btn');
-  const saveReviewBtn  = $('save-review-btn');
-  const qualityBtn     = $('quality-btn');
-  const kbdHint        = $('kbd-hint');
-  const modeTabs       = document.querySelectorAll('.mode-tab');
+  const viewfinder      = $('viewfinder');
+  const photoCanvas     = $('photoCanvas');
+  const captureBtn      = $('captureBtn');
+  const switchCameraBtn = $('switchCameraBtn');
+  const galleryPreview  = $('galleryPreview');
+  const flash           = $('flash');
+  const overlay         = $('overlay');
+  const startCameraBtn  = $('startCameraBtn');
+  const gridOverlay     = $('grid-overlay');
+  const gridBtn         = $('grid-btn');
+  const ratioBtn        = $('ratio-btn');
+  const timerBtn        = $('timer-btn');
+  const timerLabel      = $('timer-label');
+  const timerDisplay    = $('timer-display');
+  const maskTop         = $('aspect-mask-top');
+  const maskBottom      = $('aspect-mask-bottom');
+  const zoomBar         = $('zoom-bar');
+  const zoomSlider      = $('zoom-slider');
+  const zoomLabel       = $('zoom-label');
+  const focusRing       = $('focus-ring');
+  const aeLockBadge     = $('ae-lock-badge');
+  const aeBtn           = $('ae-btn');
+  const torchBtn        = $('torch-btn');
+  const expoBtn         = $('expo-btn');
+  const expoBar         = $('expo-bar');
+  const expoSlider      = $('expo-slider');
+  const expoLabelEl     = $('expo-label');
+  const countNum        = $('count-num');
+  const countBadge      = $('photo-count-badge');
+  const reviewOverlay   = $('review-overlay');
+  const reviewImg       = $('review-img');
+  const closeReviewBtn  = $('close-review-btn');
+  const saveReviewBtn   = $('save-review-btn');
+  const qualityBtn      = $('quality-btn');
+  const aaBtn           = $('aa-btn');
+  const kbdHint         = $('kbd-hint');
+  const recBadge        = $('rec-badge');
+  const recTime         = $('rec-time');
+  const galleryOverlay  = $('gallery-overlay');
+  const galleryImg      = $('gallery-img');
+  const galleryCounter  = $('gallery-counter');
+  const galleryClose    = $('gallery-close');
+  const galPrev         = $('gal-prev');
+  const galNext         = $('gal-next');
+  const galSave         = $('gal-save');
+  const galDelete       = $('gal-delete');
+  const modeTabs        = document.querySelectorAll('.mode-tab');
 
   // ── STATE ──
-  let currentStream   = null;
-  let useFront        = false;
-  let showGrid        = false;
-  let timerSec        = 0;
-  let timerTimeout    = null;
-  let isTimerRunning  = false;
-  let photoCount      = 0;
-  let lastImageData   = null;
-  let lastDownloadName= '';
-  let aeLocked        = false;
-  let torchOn         = false;
-  let currentTrack    = null;
-  let activeMode      = 'photo';
-  let expoVisible     = false;
-  let zoomRafId       = null;
-  let pendingZoom     = null;
+  let currentStream    = null;
+  let useFront         = false;
+  let showGrid         = false;
+  let timerSec         = 0;
+  let timerTimeout     = null;
+  let isTimerRunning   = false;
+  let photoCount       = 0;
+  let lastImageData    = null;
+  let lastDownloadName = '';
+  let aeLocked         = false;
+  let torchOn          = false;
+  let currentTrack     = null;
+  let activeMode       = 'photo';
+  let expoVisible      = false;
+  let zoomRafId        = null;
+  let pendingZoom      = null;
+  let aaEnabled        = true;   // anti-aliasing on by default
+  // video recording
+  let mediaRecorder    = null;
+  let recChunks        = [];
+  let recStartTime     = 0;
+  let recTimerInt      = null;
+  // gallery
+  const gallery        = [];    // { dataUrl, name, type:'photo'|'video' }
+  let galIdx           = 0;
 
   const ratios      = ['4:3', '16:9', '1:1'];
   const timerStates = [0, 3, 10];
@@ -1201,19 +1490,15 @@
   let qualityIdx = 0;
 
   // ── HAPTIC ──
-  function haptic(ms = 8) {
-    if (navigator.vibrate) navigator.vibrate(ms);
-  }
+  const haptic = (ms = 8) => navigator.vibrate?.(ms);
 
   // ── ASPECT RATIO MASKS ──
   function applyAspectMask() {
-    const ratio = ratios[ratioIdx];
     const vw = window.innerWidth, vh = window.innerHeight;
     let bar = 0;
-    if (ratio === '16:9') bar = Math.max(0, (vh - vw * 9 / 16) / 2);
-    else if (ratio === '1:1') bar = Math.max(0, (vh - vw) / 2);
-    maskTop.style.height = bar + 'px';
-    maskBottom.style.height = bar + 'px';
+    if (ratios[ratioIdx] === '16:9') bar = Math.max(0, (vh - vw * 9 / 16) / 2);
+    else if (ratios[ratioIdx] === '1:1') bar = Math.max(0, (vh - vw) / 2);
+    maskTop.style.height = maskBottom.style.height = bar + 'px';
   }
 
   ratioBtn.addEventListener('click', () => {
@@ -1247,7 +1532,14 @@
     qualityBtn.textContent = qualities[qualityIdx];
   });
 
-  // ── EXPOSURE SLIDER ──
+  // ── ANTI-ALIASING TOGGLE ──
+  aaBtn.addEventListener('click', () => {
+    haptic();
+    aaEnabled = !aaEnabled;
+    aaBtn.classList.toggle('active', aaEnabled);
+  });
+
+  // ── EXPOSURE ──
   expoBtn.addEventListener('click', () => {
     haptic();
     expoVisible = !expoVisible;
@@ -1258,7 +1550,6 @@
   expoSlider.addEventListener('input', () => {
     const v = parseFloat(expoSlider.value).toFixed(1);
     expoLabelEl.textContent = (v >= 0 ? '+' : '') + v;
-    // CSS filter to simulate EV (no native API on most browsers)
     const brightness = 1 + parseFloat(v) * 0.3;
     viewfinder.style.filter = `brightness(${brightness})`;
   }, { passive: true });
@@ -1282,21 +1573,14 @@
     const val = parseFloat(zoomSlider.value);
     zoomLabel.textContent = val.toFixed(1) + '×';
     pendingZoom = val;
-    if (!zoomRafId) {
-      zoomRafId = requestAnimationFrame(() => {
-        applyZoom(pendingZoom);
-        zoomRafId = null;
-      });
-    }
+    if (!zoomRafId) zoomRafId = requestAnimationFrame(() => { applyZoom(pendingZoom); zoomRafId = null; });
   }, { passive: true });
 
   // ── PINCH TO ZOOM ──
   let pinchDist0 = 0, zoomVal0 = 1;
   viewfinder.addEventListener('touchstart', e => {
     if (e.touches.length === 2) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      pinchDist0 = Math.hypot(dx, dy);
+      pinchDist0 = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
       zoomVal0 = parseFloat(zoomSlider.value);
       zoomBar.classList.remove('hidden');
     }
@@ -1304,39 +1588,26 @@
 
   viewfinder.addEventListener('touchmove', e => {
     if (e.touches.length !== 2 || !pinchDist0) return;
-    const dx = e.touches[0].clientX - e.touches[1].clientX;
-    const dy = e.touches[0].clientY - e.touches[1].clientY;
-    const dist = Math.hypot(dx, dy);
-    const scale = dist / pinchDist0;
-    const newZoom = Math.min(5, Math.max(1, zoomVal0 * scale));
+    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    const newZoom = Math.min(5, Math.max(1, zoomVal0 * (dist / pinchDist0)));
     zoomSlider.value = newZoom;
     zoomLabel.textContent = newZoom.toFixed(1) + '×';
     pendingZoom = newZoom;
-    if (!zoomRafId) {
-      zoomRafId = requestAnimationFrame(() => {
-        applyZoom(pendingZoom);
-        zoomRafId = null;
-      });
-    }
+    if (!zoomRafId) zoomRafId = requestAnimationFrame(() => { applyZoom(pendingZoom); zoomRafId = null; });
   }, { passive: true });
 
-  // ── CONSOLIDATED VIEWFINDER CLICK (tap-focus + double-tap AE lock) ──
-  let focusHideTimeout = null;
-  let lastTap = 0;
-
+  // ── TAP FOCUS + DOUBLE-TAP AE LOCK ──
+  let focusHideTimeout = null, lastTap = 0;
   viewfinder.addEventListener('click', e => {
     const now = Date.now();
-    const isDoubleTap = (now - lastTap) < 320;
+    const dbl = now - lastTap < 320;
     lastTap = now;
-
-    if (isDoubleTap) {
-      // double-tap = toggle AE/AF lock
+    if (dbl) {
       aeLocked = !aeLocked;
       aeBtn.classList.toggle('active', aeLocked);
       aeLockBadge.classList.toggle('visible', aeLocked);
       if (aeLocked) {
-        focusRing.style.left = e.clientX + 'px';
-        focusRing.style.top  = e.clientY + 'px';
+        focusRing.style.cssText += `left:${e.clientX}px;top:${e.clientY}px`;
         focusRing.classList.add('active', 'locked');
       } else {
         focusRing.classList.remove('locked', 'active');
@@ -1344,14 +1615,7 @@
       }
       return;
     }
-
-    // single tap = focus point
-    if (aeLocked) {
-      aeLocked = false;
-      aeBtn.classList.remove('active');
-      aeLockBadge.classList.remove('visible');
-      focusRing.classList.remove('locked');
-    }
+    if (aeLocked) { aeLocked = false; aeBtn.classList.remove('active'); aeLockBadge.classList.remove('visible'); focusRing.classList.remove('locked'); }
     focusRing.style.left = e.clientX + 'px';
     focusRing.style.top  = e.clientY + 'px';
     focusRing.classList.add('active');
@@ -1360,7 +1624,6 @@
     focusHideTimeout = setTimeout(() => focusRing.classList.remove('active'), 1800);
   });
 
-  // ── AE BUTTON ──
   aeBtn.addEventListener('click', () => {
     haptic();
     aeLocked = !aeLocked;
@@ -1383,43 +1646,36 @@
   });
 
   // ── MODE TABS ──
-  modeTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      haptic();
-      modeTabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      activeMode = tab.dataset.mode;
-    });
-  });
+  modeTabs.forEach(tab => tab.addEventListener('click', () => {
+    haptic();
+    modeTabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    activeMode = tab.dataset.mode;
+    // stop recording if switching away from video mid-record
+    if (activeMode !== 'video' && mediaRecorder?.state === 'recording') stopVideo();
+  }));
 
   // ── KEYBOARD SHORTCUTS ──
   document.addEventListener('keydown', e => {
     if (e.repeat) return;
     if (e.code === 'Space') { e.preventDefault(); handleShutter(); }
-    if (e.code === 'KeyG')  gridBtn.click();
-    if (e.code === 'KeyF')  viewfinder.click();
-    if (e.code === 'KeyT')  torchBtn.click();
+    if (e.code === 'KeyG') gridBtn.click();
+    if (e.code === 'KeyT') torchBtn.click();
+    if (e.code === 'ArrowLeft'  && galleryOverlay.classList.contains('open')) galPrev.click();
+    if (e.code === 'ArrowRight' && galleryOverlay.classList.contains('open')) galNext.click();
+    if (e.code === 'Escape'     && galleryOverlay.classList.contains('open')) galleryClose.click();
   });
 
-  // hide keyboard hint after first use
-  document.addEventListener('keydown', () => {
-    kbdHint.style.opacity = '0';
-  }, { once: true });
+  document.addEventListener('keydown', () => { kbdHint.style.opacity = '0'; }, { once: true });
 
   // ── INIT CAMERA ──
   async function initCamera() {
-    if (currentStream) {
-      currentStream.getTracks().forEach(t => t.stop());
-      currentStream = null;
-    }
-    const constraints = {
-      video: {
-        facingMode: useFront ? 'user' : 'environment',
-        width: { ideal: 3840 }, height: { ideal: 2160 }
-      }, audio: false
-    };
+    if (currentStream) { currentStream.getTracks().forEach(t => t.stop()); currentStream = null; }
     try {
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: useFront ? 'user' : 'environment', width: { ideal: 3840 }, height: { ideal: 2160 } },
+        audio: false
+      });
       currentStream = stream;
       viewfinder.srcObject = stream;
       currentTrack = stream.getVideoTracks()[0];
@@ -1428,54 +1684,57 @@
       applyAspectMask();
     } catch(err) {
       overlay.classList.remove('hidden');
-      overlay.innerHTML = `
-        <div class="cam-logo">CAM · PRO</div>
-        <h1>Camera Error</h1>
-        <p>${err.message}</p>
-        <button onclick="location.reload()">Try Again</button>
-      `;
+      overlay.innerHTML = `<div class="cam-logo">CAM · PRO</div><h1>Camera Error</h1><p>${err.message}</p><button onclick="location.reload()">Try Again</button>`;
     }
   }
 
   // ── CAPTURE HELPERS ──
   function _getQualityArgs() {
     const q = qualities[qualityIdx];
-    const mime = qualityMime[q];
-    const ext  = qualityExt[q];
-    const qual = q === 'JPG' ? 0.92 : undefined;
-    return { mime, ext, qual };
+    return { mime: qualityMime[q], ext: qualityExt[q], qual: q === 'JPG' ? 0.92 : undefined };
   }
 
-  function _drawFrame(ctx, w, h) {
-    if (useFront) {
-      ctx.save();
-      ctx.translate(w, 0);
-      ctx.scale(-1, 1);
+  // Anti-aliasing: draws at 2× then downsamples to native res
+  function _drawFrameAA(ctx, w, h) {
+    if (aaEnabled) {
+      const scale = 2;
+      const sw = w * scale, sh = h * scale;
+      // draw at 2× on a scratch canvas
+      const scratch = document.createElement('canvas');
+      scratch.width = sw; scratch.height = sh;
+      const sCtx = scratch.getContext('2d');
+      sCtx.imageSmoothingEnabled = true;
+      sCtx.imageSmoothingQuality = 'high';
+      if (useFront) { sCtx.save(); sCtx.translate(sw, 0); sCtx.scale(-1, 1); }
+      sCtx.drawImage(viewfinder, 0, 0, sw, sh);
+      if (useFront) sCtx.restore();
+      // downsample back to target
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(scratch, 0, 0, sw, sh, 0, 0, w, h);
+    } else {
+      ctx.imageSmoothingEnabled = false;
+      if (useFront) { ctx.save(); ctx.translate(w, 0); ctx.scale(-1, 1); }
+      ctx.drawImage(viewfinder, 0, 0, w, h);
+      if (useFront) ctx.restore();
     }
-    ctx.drawImage(viewfinder, 0, 0, w, h);
-    if (useFront) ctx.restore();
   }
 
-  function _finaliseCapture(dataUrl, prefix, ext) {
-    lastImageData = dataUrl;
-    lastDownloadName = `${prefix}_${Date.now()}.${ext}`;
+  function _finaliseCapture(dataUrl, name, type = 'photo') {
+    lastImageData    = dataUrl;
+    lastDownloadName = name;
+    gallery.push({ dataUrl, name, type });
     photoCount++;
-    countNum.textContent = photoCount;
-    countBadge.textContent = photoCount;
+    countNum.textContent    = photoCount;
+    countBadge.textContent  = photoCount;
     countBadge.classList.add('show');
     galleryPreview.style.backgroundImage = `url(${dataUrl})`;
-    galleryPreview.style.borderColor = 'var(--amber)';
-    // restart animation without reflow – swap class via rAF
+    galleryPreview.style.borderColor     = 'var(--amber)';
     galleryPreview.classList.remove('flash-in');
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        galleryPreview.classList.add('flash-in');
-        setTimeout(() => {
-          galleryPreview.style.borderColor = 'rgba(255,255,255,0.2)';
-          galleryPreview.classList.remove('flash-in');
-        }, 600);
-      });
-    });
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      galleryPreview.classList.add('flash-in');
+      setTimeout(() => { galleryPreview.style.borderColor = 'rgba(255,255,255,0.2)'; galleryPreview.classList.remove('flash-in'); }, 600);
+    }));
   }
 
   // ── TAKE PHOTO ──
@@ -1489,11 +1748,11 @@
 
     const { mime, ext, qual } = _getQualityArgs();
     const w = viewfinder.videoWidth, h = viewfinder.videoHeight;
-    photoCanvas.width = w;
-    photoCanvas.height = h;
+    photoCanvas.width = w; photoCanvas.height = h;
     const ctx = photoCanvas.getContext('2d', { willReadFrequently: false });
-    _drawFrame(ctx, w, h);
-    _finaliseCapture(photoCanvas.toDataURL(mime, qual), 'CAM', ext);
+    _drawFrameAA(ctx, w, h);
+    const ts = Date.now();
+    _finaliseCapture(photoCanvas.toDataURL(mime, qual), `CAM_${ts}.${ext}`);
   }
 
   // ── DYNAMIC PHOTO ──
@@ -1506,16 +1765,11 @@
     captureBtn.classList.add('timer-running');
     let f = 0;
     const burst = setInterval(() => {
-      // reuse a single offscreen scratch canvas per frame
       const c = document.createElement('canvas');
       c.width = w; c.height = h;
-      _drawFrame(c.getContext('2d'), w, h);
+      _drawFrameAA(c.getContext('2d'), w, h);
       frames.push(c);
-      if (++f >= TOTAL) {
-        clearInterval(burst);
-        captureBtn.classList.remove('timer-running');
-        _composeDynamic(frames, w, h);
-      }
+      if (++f >= TOTAL) { clearInterval(burst); captureBtn.classList.remove('timer-running'); _composeDynamic(frames, w, h); }
     }, INTERVAL);
   }
 
@@ -1523,25 +1777,80 @@
     flash.style.opacity = 0.5;
     setTimeout(() => { flash.style.opacity = 0; }, 100);
     const { mime, ext, qual } = _getQualityArgs();
-    photoCanvas.width = w;
-    photoCanvas.height = h;
+    photoCanvas.width = w; photoCanvas.height = h;
     const ctx = photoCanvas.getContext('2d', { willReadFrequently: false });
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(frames[0], 0, 0);
-    for (let i = 1; i < frames.length; i++) {
-      ctx.globalAlpha = 0.28 + (i / frames.length) * 0.45;
-      ctx.drawImage(frames[i], 0, 0);
-    }
+    for (let i = 1; i < frames.length; i++) { ctx.globalAlpha = 0.28 + (i / frames.length) * 0.45; ctx.drawImage(frames[i], 0, 0); }
     ctx.globalAlpha = 1;
-    _finaliseCapture(photoCanvas.toDataURL(mime, qual), 'CAM_DYN', ext);
+    _finaliseCapture(photoCanvas.toDataURL(mime, qual), `CAM_DYN_${Date.now()}.${ext}`);
   }
 
-  // ── SHUTTER ──
+  // ── VIDEO RECORDING ──
+  function startVideo() {
+    if (!currentStream) return;
+    recChunks = [];
+    const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm';
+    mediaRecorder = new MediaRecorder(currentStream, { mimeType });
+    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recChunks.push(e.data); };
+    mediaRecorder.onstop = _saveVideo;
+    mediaRecorder.start(200); // collect in 200ms chunks
+    recStartTime = Date.now();
+    recBadge.classList.add('visible');
+    captureBtn.classList.add('recording');
+    haptic(20);
+    recTimerInt = setInterval(() => {
+      const s = Math.floor((Date.now() - recStartTime) / 1000);
+      recTime.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+    }, 500);
+  }
+
+  function stopVideo() {
+    if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
+    mediaRecorder.stop();
+    recBadge.classList.remove('visible');
+    captureBtn.classList.remove('recording');
+    clearInterval(recTimerInt);
+    haptic(15);
+  }
+
+  function _saveVideo() {
+    const blob = new Blob(recChunks, { type: 'video/webm' });
+    const url  = URL.createObjectURL(blob);
+    const name = `CAM_VID_${Date.now()}.webm`;
+    // store in gallery as video entry (thumbnail = first frame via canvas)
+    const tmpVid = document.createElement('video');
+    tmpVid.src = url;
+    tmpVid.muted = true;
+    tmpVid.playsInline = true;
+    tmpVid.onloadeddata = () => {
+      tmpVid.currentTime = 0.1;
+    };
+    tmpVid.onseeked = () => {
+      const tc = document.createElement('canvas');
+      tc.width = tmpVid.videoWidth || 320; tc.height = tmpVid.videoHeight || 180;
+      tc.getContext('2d').drawImage(tmpVid, 0, 0, tc.width, tc.height);
+      const thumb = tc.toDataURL('image/jpeg', 0.7);
+      gallery.push({ dataUrl: url, thumbUrl: thumb, name, type: 'video' });
+      photoCount++;
+      countNum.textContent   = photoCount;
+      countBadge.textContent = photoCount;
+      countBadge.classList.add('show');
+      galleryPreview.style.backgroundImage = `url(${thumb})`;
+      galleryPreview.style.borderColor = 'var(--red)';
+      setTimeout(() => { galleryPreview.style.borderColor = 'rgba(255,255,255,0.2)'; }, 800);
+    };
+  }
+
+  // ── SHUTTER — dispatches by mode ──
   function handleShutter() {
-    if (isTimerRunning) return;
-    if (timerSec === 0) {
-      activeMode === 'dynamic' ? takeDynamicPhoto() : takePhoto();
+    if (activeMode === 'video') {
+      mediaRecorder?.state === 'recording' ? stopVideo() : startVideo();
       return;
     }
+    if (isTimerRunning) return;
+    if (timerSec === 0) { activeMode === 'dynamic' ? takeDynamicPhoto() : takePhoto(); return; }
     isTimerRunning = true;
     captureBtn.classList.add('timer-running');
     let remaining = timerSec;
@@ -1563,19 +1872,80 @@
     timerTimeout = setTimeout(tick, 1000);
   }
 
-  // ── REVIEW ──
-  galleryPreview.addEventListener('click', () => {
-    if (!lastImageData) return;
-    reviewImg.src = lastImageData;
-    reviewOverlay.classList.add('open');
+  // ── GALLERY BROWSER ──
+  function openGallery(startIdx) {
+    if (!gallery.length) return;
+    galIdx = Math.max(0, Math.min(startIdx, gallery.length - 1));
+    showGalleryItem();
+    galleryOverlay.classList.add('open');
+  }
+
+  function showGalleryItem(dir) {
+    const item = gallery[galIdx];
+    const img = galleryImg;
+    if (dir) {
+      img.classList.remove('slide-left', 'slide-right');
+      void img.offsetWidth; // minimal reflow only here, unavoidable for animation restart
+      img.classList.add(dir === 1 ? 'slide-left' : 'slide-right');
+    }
+    img.src = item.thumbUrl || item.dataUrl;
+    galleryCounter.textContent = `${galIdx + 1} / ${gallery.length}`;
+    // show video indicator overlay
+    galSave.dataset.href = item.dataUrl;
+    galSave.dataset.name = item.name;
+  }
+
+  galPrev.addEventListener('click', () => {
+    if (galIdx <= 0) return;
+    galIdx--; showGalleryItem(-1); haptic(6);
   });
+  galNext.addEventListener('click', () => {
+    if (galIdx >= gallery.length - 1) return;
+    galIdx++; showGalleryItem(1); haptic(6);
+  });
+  galDelete.addEventListener('click', () => {
+    haptic(15);
+    gallery.splice(galIdx, 1);
+    photoCount = gallery.length;
+    countNum.textContent = photoCount;
+    countBadge.textContent = photoCount;
+    if (!gallery.length) { galleryOverlay.classList.remove('open'); return; }
+    galIdx = Math.min(galIdx, gallery.length - 1);
+    showGalleryItem();
+  });
+  galSave.addEventListener('click', () => {
+    haptic(10);
+    const item = gallery[galIdx];
+    const a = document.createElement('a');
+    a.href = item.dataUrl; a.download = item.name; a.click();
+  });
+  galleryClose.addEventListener('click', () => {
+    galleryOverlay.classList.remove('open');
+    haptic(8);
+  });
+
+  // swipe gallery with touch
+  let galSwipeX0 = null;
+  $('gallery-track').addEventListener('touchstart', e => { galSwipeX0 = e.touches[0].clientX; }, { passive: true });
+  $('gallery-track').addEventListener('touchend', e => {
+    if (galSwipeX0 === null) return;
+    const dx = e.changedTouches[0].clientX - galSwipeX0;
+    galSwipeX0 = null;
+    if (Math.abs(dx) < 40) return;
+    dx < 0 ? galNext.click() : galPrev.click();
+  }, { passive: true });
+
+  // open gallery from thumbnail
+  galleryPreview.addEventListener('click', () => {
+    if (!gallery.length) return;
+    openGallery(gallery.length - 1);
+  });
+
+  // ── LEGACY REVIEW (kept for quick last-shot review from close btn) ──
   closeReviewBtn.addEventListener('click', () => reviewOverlay.classList.remove('open'));
   saveReviewBtn.addEventListener('click', () => {
     if (!lastImageData) return;
-    const a = document.createElement('a');
-    a.href = lastImageData;
-    a.download = lastDownloadName;
-    a.click();
+    const a = document.createElement('a'); a.href = lastImageData; a.download = lastDownloadName; a.click();
   });
 
   // ── SWITCH CAMERA ──
@@ -1586,16 +1956,14 @@
       switchCameraBtn.classList.add('flipping');
       setTimeout(() => switchCameraBtn.classList.remove('flipping'), 400);
     });
+    if (mediaRecorder?.state === 'recording') stopVideo();
     useFront = !useFront;
     initCamera();
   });
 
-  // ── RESIZE (debounced) ──
+  // ── RESIZE ──
   let resizeTimer = null;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(applyAspectMask, 120);
-  }, { passive: true });
+  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(applyAspectMask, 120); }, { passive: true });
 
   startCameraBtn.addEventListener('click', initCamera);
   captureBtn.addEventListener('click', handleShutter);
