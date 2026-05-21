@@ -1,382 +1,3437 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gallery</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>RobloxUI Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --wall: #f8f8f6;
-      --shadow: rgba(0,0,0,0.08);
-      --frame: #fff;
-      --arrow: #1a1a1a;
-      --arrow-hover: #555;
-      --transition: 0.55s cubic-bezier(0.77, 0, 0.175, 1);
+      --bg0: #0d0f14;
+      --bg1: #12151c;
+      --bg2: #181c26;
+      --bg3: #1f2433;
+      --bg4: #252b3b;
+      --bg5: #2c3449;
+      --border: #2e3650;
+      --border2: #3a4460;
+      --accent: #5b8def;
+      --accent2: #7c6af5;
+      --accent3: #3dd6b5;
+      --accent-glow: rgba(91, 141, 239, 0.18);
+      --red: #f05d6a;
+      --orange: #f0924d;
+      --yellow: #f0c94d;
+      --green: #4dc97e;
+      --purple: #a97ef5;
+      --text0: #e8eaf2;
+      --text1: #b8bdcc;
+      --text2: #7c839a;
+      --text3: #4a5068;
+      --sidebar-w: 260px;
+      --panel-h: 260px;
+      --topbar-h: 44px;
+      --tab-h: 36px;
+      --radius: 6px;
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
     }
 
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
     body {
-      background: #e8e8e6;
-      font-family: 'Georgia', serif;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-    }
-
-    /* ── ROOM / WALL ─────────────────────────────── */
-    .room {
-      perspective: 900px;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .wall {
-      position: relative;
-      width: min(82vw, 900px);
-      height: min(72vh, 580px);
-      background: var(--wall);
-      border-radius: 2px;
-      box-shadow:
-        0 2px 0 #ddd,
-        0 4px 0 #ccc,
-        0 40px 80px rgba(0,0,0,0.18),
-        inset 0 0 60px rgba(0,0,0,0.02);
-      transform-style: preserve-3d;
-      transform: rotateX(1deg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    /* subtle baseboard */
-    .wall::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 14px;
-      background: linear-gradient(to top, #ddd, transparent);
-      pointer-events: none;
-    }
-
-    /* ── FRAME VIEWPORT ──────────────────────────── */
-    .frame-wrap {
-      position: relative;
-      width: 72%;
-      max-width: 560px;
-      aspect-ratio: 4/3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .frame {
-      position: absolute;
-      inset: 0;
-      background: var(--frame);
-      box-shadow:
-        0 0 0 2px #e0e0e0,
-        0 0 0 18px var(--frame),
-        0 0 0 20px #d8d8d4,
-        8px 12px 32px rgba(0,0,0,0.18);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    /* picture inside the frame */
-    .pic {
-      position: absolute;
-      inset: 18px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #f0f0ee;
-    }
-
-    .pic img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
-      display: block;
-      transition: opacity 0.3s ease;
+      overflow: hidden;
+      background: var(--bg0);
+      color: var(--text0);
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
-    /* ── SLIDE ANIMATION LAYERS ──────────────────── */
-    .slide-out-left  { animation: slideOutLeft  var(--transition) forwards; }
-    .slide-out-right { animation: slideOutRight var(--transition) forwards; }
-    .slide-in-left   { animation: slideInLeft   var(--transition) forwards; }
-    .slide-in-right  { animation: slideInRight  var(--transition) forwards; }
-
-    @keyframes slideOutLeft  { to { transform: translateX(-110%) scale(0.9); opacity: 0; } }
-    @keyframes slideOutRight { to { transform: translateX( 110%) scale(0.9); opacity: 0; } }
-    @keyframes slideInLeft   { from { transform: translateX(-110%) scale(0.9); opacity: 0; } to { transform: none; opacity: 1; } }
-    @keyframes slideInRight  { from { transform: translateX( 110%) scale(0.9); opacity: 0; } to { transform: none; opacity: 1; } }
-
-    /* ── ARROWS ──────────────────────────────────── */
-    .arrows {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
+    /* ── TOPBAR ── */
+    #topbar {
+      height: var(--topbar-h);
+      background: var(--bg1);
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 0 22px;
+      padding: 0 12px;
+      gap: 8px;
+      position: relative;
+      z-index: 100;
     }
 
-    .arrow {
-      pointer-events: all;
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: 12px 10px;
-      opacity: 0.35;
-      transition: opacity 0.2s, transform 0.2s;
+    #topbar .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text0);
+      letter-spacing: -0.3px;
+      padding-right: 16px;
+      border-right: 1px solid var(--border);
     }
 
-    .arrow:hover { opacity: 1; transform: scale(1.15); }
-    .arrow:active { transform: scale(0.95); }
-
-    .arrow svg {
+    #topbar .logo .logo-icon {
       width: 28px;
       height: 28px;
-      stroke: var(--arrow);
-      stroke-width: 1.5;
-      fill: none;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: #fff;
     }
 
-    /* ── COUNTER ─────────────────────────────────── */
-    .counter {
-      position: absolute;
-      bottom: 22px;
-      left: 50%;
-      transform: translateX(-50%);
+    .tb-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tb-btn {
+      height: 30px;
+      padding: 0 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      color: var(--text1);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .tb-btn:hover {
+      background: var(--bg3);
+      border-color: var(--border);
+      color: var(--text0);
+    }
+
+    .tb-btn.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .tb-btn.primary:hover {
+      background: #4a7de0;
+    }
+
+    .tb-btn.success {
+      background: var(--green);
+      color: #0a1a10;
+      border-color: transparent;
+    }
+
+    .tb-btn.success:hover {
+      filter: brightness(1.1);
+    }
+
+    .tb-sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      margin: 0 4px;
+    }
+
+    .tb-spacer {
+      flex: 1;
+    }
+
+    .tb-badge {
+      font-size: 10px;
+      background: var(--accent2);
+      color: #fff;
+      border-radius: 3px;
+      padding: 1px 5px;
+    }
+
+    /* ── LAYOUT ── */
+    #layout {
+      display: flex;
+      width: 100%;
+      height: calc(100vh - var(--topbar-h));
+    }
+
+    /* ── SIDEBAR ── */
+    #sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: var(--bg1);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      padding: 0 8px;
+      height: 38px;
+      align-items: flex-end;
+      gap: 2px;
+    }
+
+    .sidebar-tab {
+      padding: 0 10px;
+      height: 30px;
+      border-radius: 5px 5px 0 0;
       font-size: 11px;
-      letter-spacing: 0.18em;
-      color: #aaa;
-      font-family: 'Georgia', serif;
+      font-weight: 700;
+      font-family: 'Syne', sans-serif;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+
+    .sidebar-tab.active {
+      background: var(--bg3);
+      color: var(--text0);
+      border-top: 2px solid var(--accent);
+    }
+
+    .sidebar-tab:hover:not(.active) {
+      color: var(--text1);
+    }
+
+    .sidebar-search {
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-search input {
+      width: 100%;
+      height: 28px;
+      padding: 0 8px 0 28px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text0);
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      outline: none;
+    }
+
+    .sidebar-search input:focus {
+      border-color: var(--accent);
+    }
+
+    .sidebar-search .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text3);
+      font-size: 11px;
+      pointer-events: none;
+    }
+
+    .sidebar-search-wrap {
+      position: relative;
+    }
+
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 0;
+    }
+
+    .sidebar-content::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .sidebar-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .sidebar-content::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 2px;
+    }
+
+    .tree-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 8px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text1);
+      border-radius: 4px;
+      margin: 1px 4px;
+      transition: all 0.1s;
+      position: relative;
+    }
+
+    .tree-item:hover {
+      background: var(--bg3);
+      color: var(--text0);
+    }
+
+    .tree-item.active {
+      background: var(--accent-glow);
+      color: var(--accent);
+    }
+
+    .tree-item .ti-icon {
+      width: 16px;
+      text-align: center;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    .tree-item .ti-label {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tree-item .ti-badge {
+      font-size: 9px;
+      background: var(--bg5);
+      padding: 1px 4px;
+      border-radius: 2px;
+      color: var(--text2);
+    }
+
+    .tree-indent {
+      padding-left: 20px;
+    }
+
+    .tree-indent2 {
+      padding-left: 36px;
+    }
+
+    .tree-group-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 8px 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .tree-group-header i {
+      font-size: 9px;
+    }
+
+    /* ── MAIN AREA ── */
+    #main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg0);
+    }
+
+    /* ── EDITOR TABS ── */
+    #editor-tabs {
+      height: var(--tab-h);
+      background: var(--bg1);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-end;
+      padding: 0 8px;
+      gap: 2px;
+      overflow-x: auto;
+      flex-shrink: 0;
+    }
+
+    #editor-tabs::-webkit-scrollbar {
+      height: 0;
+    }
+
+    .editor-tab {
+      height: 28px;
+      padding: 0 12px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 5px 5px 0 0;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--text2);
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.12s;
+    }
+
+    .editor-tab.active {
+      background: var(--bg3);
+      color: var(--text0);
+      border-color: var(--border2);
+    }
+
+    .editor-tab .tab-close {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: var(--text3);
+      transition: all 0.1s;
+    }
+
+    .editor-tab .tab-close:hover {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .editor-tab .tab-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--orange);
+    }
+
+    /* ── EDITOR / PREVIEW SPLIT ── */
+    #work-area {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── CODE EDITOR ── */
+    #editor-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      border-right: 1px solid var(--border);
+    }
+
+    /* Search & Replace Bar */
+    #search-bar {
+      display: none;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 10px;
+      gap: 6px;
+      flex-direction: column;
+    }
+
+    #search-bar.open {
+      display: flex;
+    }
+
+    .sb-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .sb-input {
+      flex: 1;
+      height: 26px;
+      padding: 0 8px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text0);
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      outline: none;
+    }
+
+    .sb-input:focus {
+      border-color: var(--accent);
+    }
+
+    .sb-btn {
+      height: 26px;
+      padding: 0 10px;
+      background: var(--bg4);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text1);
+      cursor: pointer;
+      font-size: 11px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      transition: all 0.12s;
+      white-space: nowrap;
+    }
+
+    .sb-btn:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .sb-count {
+      font-size: 11px;
+      color: var(--text2);
+      white-space: nowrap;
+    }
+
+    .sb-toggle {
+      height: 22px;
+      width: 22px;
+      border-radius: 4px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text2);
+      cursor: pointer;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.12s;
+    }
+
+    .sb-toggle.active,
+    .sb-toggle:hover {
+      background: var(--bg4);
+      border-color: var(--border);
+      color: var(--text0);
+    }
+
+    /* Editor wrapper */
+    #editor-wrapper {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #line-numbers {
+      width: 48px;
+      min-width: 48px;
+      background: var(--bg1);
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+      padding-top: 10px;
+      text-align: right;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text3);
+      line-height: 22px;
+      padding-right: 8px;
+      pointer-events: none;
+    }
+
+    #code-editor {
+      flex: 1;
+      background: var(--bg1);
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 22px;
+      color: var(--text0);
+      padding: 10px 12px;
+      tab-size: 4;
+      white-space: pre;
+      overflow: auto;
+      caret-color: var(--accent);
+    }
+
+    #code-editor::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    #code-editor::-webkit-scrollbar-track {
+      background: var(--bg1);
+    }
+
+    #code-editor::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 4px;
+    }
+
+    /* Highlighted overlay */
+    #highlight-overlay {
+      position: absolute;
+      top: 0;
+      left: 48px;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 22px;
+      padding: 10px 12px;
+      white-space: pre;
+      overflow: hidden;
+      color: transparent;
+    }
+
+    .hl-match {
+      background: rgba(240, 192, 77, 0.3);
+      border-radius: 2px;
+    }
+
+    .hl-current {
+      background: rgba(91, 141, 239, 0.4);
+      border-radius: 2px;
+    }
+
+    /* Autocomplete dropdown */
+    #autocomplete {
+      display: none;
+      position: absolute;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      z-index: 200;
+      min-width: 240px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    #autocomplete::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    #autocomplete::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 2px;
+    }
+
+    .ac-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      transition: background 0.1s;
+    }
+
+    .ac-item:hover,
+    .ac-item.selected {
+      background: var(--accent-glow);
+      color: var(--accent);
+    }
+
+    .ac-icon {
+      width: 18px;
+      text-align: center;
+      font-size: 10px;
+    }
+
+    .ac-type {
+      font-size: 10px;
+      color: var(--text3);
+      margin-left: auto;
+      font-family: 'Syne', sans-serif;
+    }
+
+    /* Status bar */
+    #status-bar {
+      height: 24px;
+      background: var(--bg1);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 16px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text2);
+      flex-shrink: 0;
+    }
+
+    .sb-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sb-item.ok i {
+      color: var(--green);
+    }
+
+    .sb-item.warn i {
+      color: var(--yellow);
+    }
+
+    /* ── PREVIEW PANEL ── */
+    #preview-panel {
+      width: 400px;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg0);
+      overflow: hidden;
+      position: relative;
+    }
+
+    #preview-header {
+      height: 34px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text1);
+      flex-shrink: 0;
+    }
+
+    #preview-header .ph-title {
+      flex: 1;
+    }
+
+    .ph-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      background: transparent;
+      border: none;
+      color: var(--text2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      transition: all 0.12s;
+    }
+
+    .ph-btn:hover {
+      background: var(--bg4);
+      color: var(--text0);
+    }
+
+    #preview-viewport {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      background: #1a1a2e;
+      cursor: grab;
+    }
+
+    #preview-viewport.grabbing {
+      cursor: grabbing;
+    }
+
+    /* Roblox-like background */
+    #preview-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, #2b4590 0%, #1a2f6e 60%, #162260 100%);
+    }
+
+    #preview-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 40px,
+          rgba(255, 255, 255, 0.02) 40px, rgba(255, 255, 255, 0.02) 41px),
+        repeating-linear-gradient(90deg, transparent, transparent 40px,
+          rgba(255, 255, 255, 0.02) 40px, rgba(255, 255, 255, 0.02) 41px);
+    }
+
+    #preview-canvas {
+      position: absolute;
+      transform-origin: 0 0;
+    }
+
+    /* Draggable UI elements in preview */
+    .preview-ui-el {
+      position: absolute;
+      cursor: move;
+      border: 2px solid transparent;
+      transition: border-color 0.1s;
+    }
+
+    .preview-ui-el:hover {
+      border-color: var(--accent);
+    }
+
+    .preview-ui-el.selected {
+      border-color: var(--accent);
+    }
+
+    .preview-ui-el .resize-handle {
+      position: absolute;
+      right: -4px;
+      bottom: -4px;
+      width: 10px;
+      height: 10px;
+      background: var(--accent);
+      border-radius: 2px;
+      cursor: se-resize;
+      display: none;
+    }
+
+    .preview-ui-el.selected .resize-handle {
+      display: block;
+    }
+
+    #preview-controls {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .pv-ctrl {
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius);
+      background: rgba(18, 21, 28, 0.85);
+      border: 1px solid var(--border);
+      color: var(--text1);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      transition: all 0.12s;
+      backdrop-filter: blur(8px);
+    }
+
+    .pv-ctrl:hover {
+      background: var(--bg3);
+      color: var(--text0);
+    }
+
+    #preview-zoom {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(18, 21, 28, 0.85);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 4px 8px;
+      font-size: 11px;
+      color: var(--text2);
+      font-family: 'JetBrains Mono', monospace;
+      backdrop-filter: blur(8px);
+    }
+
+    /* Properties panel */
+    #properties-panel {
+      height: 200px;
+      min-height: 80px;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    #properties-panel::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    #properties-panel::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 2px;
+    }
+
+    .prop-header {
+      padding: 8px 10px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .prop-row {
+      display: flex;
+      align-items: center;
+      padding: 4px 10px;
+      gap: 8px;
+      border-bottom: 1px solid rgba(46, 54, 80, 0.4);
+      font-size: 11px;
+    }
+
+    .prop-key {
+      width: 90px;
+      color: var(--text2);
+      flex-shrink: 0;
+    }
+
+    .prop-val {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text0);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      outline: none;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    .prop-val:focus {
+      background: var(--bg3);
+      border: 1px solid var(--accent);
+    }
+
+    /* ── BOTTOM PANEL ── */
+    #bottom-panel {
+      height: var(--panel-h);
+      background: var(--bg1);
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    #bottom-tabs {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding: 0 8px;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .btm-tab {
+      height: 26px;
+      padding: 0 10px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.12s;
+    }
+
+    .btm-tab.active {
+      background: var(--bg3);
+      color: var(--text0);
+    }
+
+    .btm-tab:hover:not(.active) {
+      color: var(--text1);
+    }
+
+    #bottom-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    #bottom-content::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    #bottom-content::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 2px;
+    }
+
+    .log-line {
+      display: flex;
+      gap: 8px;
+      padding: 2px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .log-time {
+      color: var(--text3);
+      flex-shrink: 0;
+    }
+
+    .log-info {
+      color: var(--text1);
+    }
+
+    .log-warn {
+      color: var(--yellow);
+    }
+
+    .log-error {
+      color: var(--red);
+    }
+
+    .log-success {
+      color: var(--green);
+    }
+
+    .log-icon {
+      width: 14px;
+      text-align: center;
+    }
+
+    /* ── MODALS ── */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 24px;
+      width: min(480px, 90vw);
+      box-shadow: 0 8px 48px rgba(0, 0, 0, 0.5);
+      animation: modal-in 0.2s ease;
+    }
+
+    @keyframes modal-in {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text0);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-title i {
+      color: var(--accent);
+    }
+
+    .modal-desc {
+      font-size: 13px;
+      color: var(--text1);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .modal-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .modal-input {
+      flex: 1;
+      height: 36px;
+      padding: 0 12px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text0);
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      outline: none;
+    }
+
+    .modal-input:focus {
+      border-color: var(--accent);
+    }
+
+    .modal-btns {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .modal-btn {
+      height: 34px;
+      padding: 0 16px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 13px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--text0);
+      transition: all 0.15s;
+    }
+
+    .modal-btn.primary {
+      background: var(--accent);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    .modal-btn:hover {
+      filter: brightness(1.1);
+    }
+
+    /* Upload zone */
+    .upload-zone {
+      border: 2px dashed var(--border2);
+      border-radius: 8px;
+      padding: 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--bg3);
+    }
+
+    .upload-zone:hover,
+    .upload-zone.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+    }
+
+    .upload-zone i {
+      font-size: 28px;
+      color: var(--text3);
+      margin-bottom: 8px;
+    }
+
+    .upload-zone p {
+      font-size: 13px;
+      color: var(--text2);
+    }
+
+    .upload-zone span {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    /* Export modal code */
+    .export-code {
+      background: var(--bg1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text1);
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre;
+      margin-bottom: 10px;
+    }
+
+    .export-code::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .export-code::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 2px;
+    }
+
+    /* Context menu */
+    #ctx-menu {
+      display: none;
+      position: fixed;
+      z-index: 600;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 4px;
+      box-shadow: var(--shadow);
+      min-width: 180px;
+    }
+
+    #ctx-menu.open {
+      display: block;
+    }
+
+    .ctx-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text1);
+      transition: background 0.1s;
+    }
+
+    .ctx-item:hover {
+      background: var(--bg4);
+      color: var(--text0);
+    }
+
+    .ctx-item.danger:hover {
+      background: rgba(240, 93, 106, 0.15);
+      color: var(--red);
+    }
+
+    .ctx-item i {
+      width: 14px;
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .ctx-sep {
+      height: 1px;
+      background: var(--border);
+      margin: 4px 0;
+    }
+
+    .ctx-kbd {
+      margin-left: auto;
+      font-size: 10px;
+      color: var(--text3);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Resize handle for panels */
+    #resize-handle {
+      width: 4px;
+      cursor: col-resize;
+      background: transparent;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    #resize-handle:hover {
+      background: var(--accent);
+    }
+
+    /* Animations panel items */
+    .anim-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--bg4);
+      border: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--text1);
+      cursor: pointer;
+      margin: 2px;
+      transition: all 0.12s;
+    }
+
+    .anim-chip:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Minimap */
+    #minimap {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 60px;
+      background: var(--bg0);
+      border-left: 1px solid var(--border);
+      opacity: 0.6;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    #minimap-viewport {
+      position: absolute;
+      left: 0;
+      right: 0;
+      background: rgba(91, 141, 239, 0.1);
+      border: 1px solid rgba(91, 141, 239, 0.3);
+      pointer-events: none;
+    }
+
+    #minimap canvas {
+      display: block;
+      width: 100%;
+    }
+
+    /* Notification toast */
+    #toast {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-size: 13px;
+      color: var(--text0);
+      box-shadow: var(--shadow);
+      z-index: 700;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    #toast i {
+      font-size: 14px;
+    }
+
+    #toast.ok i {
+      color: var(--green);
+    }
+
+    #toast.warn i {
+      color: var(--yellow);
+    }
+
+    /* iPad / touch optimizations */
+    @media (pointer: coarse) {
+      .tb-btn {
+        height: 36px;
+        padding: 0 14px;
+      }
+
+      .tree-item {
+        padding: 8px 10px;
+      }
+
+      .editor-tab {
+        height: 34px;
+      }
+
+      .btm-tab {
+        height: 32px;
+        padding: 0 14px;
+      }
+
+      #code-editor {
+        font-size: 14px;
+        line-height: 24px;
+      }
+
+      .ac-item {
+        padding: 10px 12px;
+      }
+
+      .ph-btn {
+        width: 34px;
+        height: 34px;
+      }
+
+      .pv-ctrl {
+        width: 38px;
+        height: 38px;
+        font-size: 14px;
+      }
+    }
+
+    /* Splitter for sidebar */
+    #sidebar-resizer {
+      width: 3px;
+      cursor: col-resize;
+      background: transparent;
+      transition: background 0.15s;
+      flex-shrink: 0;
+      touch-action: none;
+    }
+
+    #sidebar-resizer:hover {
+      background: var(--accent);
+    }
+
+    /* Lua syntax highlighting colors for display */
+    .kw {
+      color: #7c6af5;
+    }
+
+    .fn {
+      color: #5b8def;
+    }
+
+    .str {
+      color: #4dc97e;
+    }
+
+    .num {
+      color: #f0924d;
+    }
+
+    .cm {
+      color: #4a5068;
       font-style: italic;
     }
 
-    /* ── DOT STRIP ───────────────────────────────── */
-    .dots {
-      position: absolute;
-      bottom: 42px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 7px;
-      align-items: center;
+    .prop {
+      color: #f0c94d;
     }
 
-    .dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: #ccc;
-      transition: background 0.3s, transform 0.3s;
+    .cls {
+      color: #3dd6b5;
+    }
+
+    /* Anim timeline */
+    .timeline-track {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding: 0 8px;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .timeline-label {
+      width: 80px;
+      color: var(--text2);
+      flex-shrink: 0;
+    }
+
+    .timeline-bar {
+      flex: 1;
+      height: 14px;
+      background: var(--bg3);
+      border-radius: 3px;
+      position: relative;
       cursor: pointer;
     }
 
-    .dot.active {
-      background: #999;
-      transform: scale(1.4);
-    }
-
-    /* ── CAPTION ─────────────────────────────────── */
-    .caption {
+    .timeline-fill {
       position: absolute;
-      bottom: -34px;
-      width: 100%;
-      text-align: center;
-      font-size: 11.5px;
-      color: #aaa;
-      letter-spacing: 0.12em;
-      font-family: 'Georgia', serif;
-      font-style: italic;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 3px;
+      transition: width 0.1s;
     }
 
-    /* ── LOADING / EMPTY ─────────────────────────── */
-    .empty {
-      color: #bbb;
-      font-size: 13px;
-      letter-spacing: 0.1em;
-      font-style: italic;
+    /* Responsive collapse */
+    @media (max-width: 768px) {
+      :root {
+        --sidebar-w: 220px;
+      }
+
+      #preview-panel {
+        width: 300px;
+      }
     }
 
-    /* ── KEYBOARD HINT ───────────────────────────── */
-    .hint {
-      position: fixed;
-      bottom: 18px;
-      right: 24px;
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      color: #bbb;
-      font-style: italic;
+    @media (max-width: 600px) {
+      #sidebar {
+        position: absolute;
+        z-index: 50;
+        left: -100%;
+        transition: left 0.25s;
+      }
+
+      #sidebar.mobile-open {
+        left: 0;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+      }
+
+      #preview-panel {
+        display: none;
+      }
+
+      #preview-panel.mobile-show {
+        display: flex;
+        position: absolute;
+        inset: 0;
+        z-index: 40;
+      }
     }
   </style>
 </head>
+
 <body>
 
-<div class="room">
-  <div class="wall" id="wall">
-
-    <!-- arrows sit on the wall, outside the frame -->
-    <div class="arrows">
-      <button class="arrow" id="btnPrev" aria-label="Previous">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <button class="arrow" id="btnNext" aria-label="Next">
-        <svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
-      </button>
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="logo">
+      <div class="logo-icon"><i class="fa-solid fa-cubes-stacked"></i></div>
+      RblxUI Studio
     </div>
+    <div class="tb-group">
+      <button class="tb-btn" onclick="newFile()"><i class="fa-solid fa-plus"></i> New</button>
+      <button class="tb-btn" onclick="openUploadModal()"><i class="fa-solid fa-upload"></i> Import</button>
+      <button class="tb-btn" onclick="openExportModal()"><i class="fa-solid fa-terminal"></i> Export to Studio</button>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-group">
+      <button class="tb-btn" onclick="toggleSearch()"><i class="fa-solid fa-magnifying-glass"></i> Find</button>
+      <button class="tb-btn" onclick="formatCode()"><i class="fa-solid fa-align-left"></i> Format</button>
+      <button class="tb-btn" onclick="runAnimation()"><i class="fa-solid fa-play"></i> Run</button>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-group">
+      <button class="tb-btn" id="mobile-sidebar-btn" onclick="toggleMobileSidebar()" style="display:none"><i class="fa-solid fa-bars"></i></button>
+      <button class="tb-btn" id="mobile-preview-btn" onclick="toggleMobilePreview()" style="display:none"><i class="fa-solid fa-eye"></i></button>
+    </div>
+    <div class="tb-spacer"></div>
+    <div class="tb-group">
+      <button class="tb-btn success" onclick="openExportModal()"><i class="fa-solid fa-rocket"></i> Deploy</button>
+    </div>
+  </div>
 
-    <!-- frame + image -->
-    <div class="frame-wrap">
-      <div class="frame" id="frame">
-        <div class="pic" id="pic">
-          <span class="empty" id="emptyMsg">no images found</span>
+  <!-- LAYOUT -->
+  <div id="layout">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+      <div class="sidebar-tabs">
+        <button class="sidebar-tab active" onclick="switchSidebarTab('explorer',this)">
+        <i class="fa-solid fa-folder-tree"></i> Explorer
+      </button>
+        <button class="sidebar-tab" onclick="switchSidebarTab('animations',this)">
+        <i class="fa-solid fa-film"></i> Anims
+      </button>
+      </div>
+
+      <!-- Explorer Tab -->
+      <div id="tab-explorer">
+        <div class="sidebar-search">
+          <div class="sidebar-search-wrap">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" placeholder="Search workspace..." id="workspace-search" oninput="filterWorkspace(this.value)">
+          </div>
+        </div>
+        <div class="sidebar-content" id="workspace-tree">
+          <div class="tree-group-header"><i class="fa-solid fa-chevron-down"></i> StarterGui</div>
+          <div class="tree-item active" onclick="selectItem(this,'ScreenGui')" data-name="ScreenGui">
+            <span class="ti-icon"><i class="fa-solid fa-display" style="color:#5b8def"></i></span>
+            <span class="ti-label">ScreenGui</span>
+            <span class="ti-badge">GUI</span>
+          </div>
+          <div class="tree-indent">
+            <div class="tree-item" onclick="selectItem(this,'MainFrame')" data-name="MainFrame">
+              <span class="ti-icon"><i class="fa-regular fa-square" style="color:#f0924d"></i></span>
+              <span class="ti-label">MainFrame</span>
+              <span class="ti-badge">Frame</span>
+            </div>
+            <div class="tree-indent">
+              <div class="tree-item" onclick="selectItem(this,'TitleLabel')" data-name="TitleLabel">
+                <span class="ti-icon"><i class="fa-solid fa-font" style="color:#4dc97e"></i></span>
+                <span class="ti-label">TitleLabel</span>
+                <span class="ti-badge">Text</span>
+              </div>
+              <div class="tree-item" onclick="selectItem(this,'PlayButton')" data-name="PlayButton">
+                <span class="ti-icon"><i class="fa-solid fa-square" style="color:#a97ef5"></i></span>
+                <span class="ti-label">PlayButton</span>
+                <span class="ti-badge">Button</span>
+              </div>
+              <div class="tree-item" onclick="selectItem(this,'CloseButton')" data-name="CloseButton">
+                <span class="ti-icon"><i class="fa-solid fa-square" style="color:#f05d6a"></i></span>
+                <span class="ti-label">CloseButton</span>
+                <span class="ti-badge">Button</span>
+              </div>
+              <div class="tree-item" onclick="selectItem(this,'HealthBar')" data-name="HealthBar">
+                <span class="ti-icon"><i class="fa-solid fa-minus" style="color:#4dc97e"></i></span>
+                <span class="ti-label">HealthBar</span>
+                <span class="ti-badge">Frame</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tree-group-header" style="margin-top:8px"><i class="fa-solid fa-chevron-down"></i> Scripts</div>
+          <div class="tree-item" onclick="selectItem(this,'AnimationController')" data-name="AnimationController">
+            <span class="ti-icon"><i class="fa-solid fa-scroll" style="color:#f0c94d"></i></span>
+            <span class="ti-label">AnimationController</span>
+            <span class="ti-badge">Script</span>
+          </div>
+          <div class="tree-item" onclick="selectItem(this,'UIManager')" data-name="UIManager">
+            <span class="ti-icon"><i class="fa-solid fa-scroll" style="color:#f0c94d"></i></span>
+            <span class="ti-label">UIManager</span>
+            <span class="ti-badge">Local</span>
+          </div>
+          <div class="tree-item" onclick="selectItem(this,'TweenHelper')" data-name="TweenHelper">
+            <span class="ti-icon"><i class="fa-solid fa-scroll" style="color:#3dd6b5"></i></span>
+            <span class="ti-label">TweenHelper</span>
+            <span class="ti-badge">Module</span>
+          </div>
+
+          <div class="tree-group-header" style="margin-top:8px"><i class="fa-solid fa-chevron-down"></i> Assets</div>
+          <div class="tree-item" onclick="selectItem(this,'Images')" data-name="Images">
+            <span class="ti-icon"><i class="fa-solid fa-images" style="color:#a97ef5"></i></span>
+            <span class="ti-label">Images</span>
+            <span class="ti-badge">Folder</span>
+          </div>
+          <div class="tree-item" onclick="selectItem(this,'Sounds')" data-name="Sounds">
+            <span class="ti-icon"><i class="fa-solid fa-music" style="color:#f0924d"></i></span>
+            <span class="ti-label">Sounds</span>
+            <span class="ti-badge">Folder</span>
+          </div>
         </div>
       </div>
-      <div class="caption" id="caption"></div>
+
+      <!-- Animations Tab -->
+      <div id="tab-animations" style="display:none; flex:1; flex-direction:column; overflow:hidden;">
+        <div class="sidebar-content">
+          <div class="tree-group-header"><i class="fa-solid fa-wand-magic-sparkles"></i> Presets</div>
+          <div style="padding:8px; display:flex; flex-wrap:wrap; gap:4px;">
+            <span class="anim-chip" onclick="insertAnimation('fade')"><i class="fa-solid fa-eye"></i> Fade</span>
+            <span class="anim-chip" onclick="insertAnimation('slide')"><i class="fa-solid fa-arrow-right"></i> Slide</span>
+            <span class="anim-chip" onclick="insertAnimation('bounce')"><i class="fa-solid fa-circle"></i> Bounce</span>
+            <span class="anim-chip" onclick="insertAnimation('scale')"><i class="fa-solid fa-up-right-and-down-left-from-center"></i> Scale</span>
+            <span class="anim-chip" onclick="insertAnimation('shake')"><i class="fa-solid fa-rotate"></i> Shake</span>
+            <span class="anim-chip" onclick="insertAnimation('pulse')"><i class="fa-solid fa-heart-pulse"></i> Pulse</span>
+            <span class="anim-chip" onclick="insertAnimation('spring')"><i class="fa-solid fa-compress"></i> Spring</span>
+            <span class="anim-chip" onclick="insertAnimation('flip')"><i class="fa-solid fa-sync"></i> Flip</span>
+            <span class="anim-chip" onclick="insertAnimation('typewriter')"><i class="fa-solid fa-keyboard"></i> Typewriter</span>
+            <span class="anim-chip" onclick="insertAnimation('rainbow')"><i class="fa-solid fa-palette"></i> Rainbow</span>
+          </div>
+          <div class="tree-group-header" style="margin-top:8px"><i class="fa-solid fa-timeline"></i> Easing Styles</div>
+          <div style="padding:8px; display:flex; flex-wrap:wrap; gap:4px;">
+            <span class="anim-chip" onclick="insertEasing('Linear')">Linear</span>
+            <span class="anim-chip" onclick="insertEasing('Quad')">Quad</span>
+            <span class="anim-chip" onclick="insertEasing('Cubic')">Cubic</span>
+            <span class="anim-chip" onclick="insertEasing('Quart')">Quart</span>
+            <span class="anim-chip" onclick="insertEasing('Quint')">Quint</span>
+            <span class="anim-chip" onclick="insertEasing('Sine')">Sine</span>
+            <span class="anim-chip" onclick="insertEasing('Back')">Back</span>
+            <span class="anim-chip" onclick="insertEasing('Bounce')">Bounce</span>
+            <span class="anim-chip" onclick="insertEasing('Elastic')">Elastic</span>
+            <span class="anim-chip" onclick="insertEasing('Exponential')">Exponential</span>
+            <span class="anim-chip" onclick="insertEasing('Circular')">Circular</span>
+          </div>
+          <div class="tree-group-header" style="margin-top:8px"><i class="fa-solid fa-sliders"></i> Timeline</div>
+          <div style="padding:4px 0;">
+            <div class="timeline-track">
+              <span class="timeline-label">Position</span>
+              <div class="timeline-bar">
+                <div class="timeline-fill" style="width:60%"></div>
+              </div>
+            </div>
+            <div class="timeline-track">
+              <span class="timeline-label">Size</span>
+              <div class="timeline-bar">
+                <div class="timeline-fill" style="width:40%; background: linear-gradient(90deg, #4dc97e, #3dd6b5)">
+                </div>
+              </div>
+            </div>
+            <div class="timeline-track">
+              <span class="timeline-label">Rotation</span>
+              <div class="timeline-bar">
+                <div class="timeline-fill" style="width:25%; background: linear-gradient(90deg, #a97ef5, #7c6af5)">
+                </div>
+              </div>
+            </div>
+            <div class="timeline-track">
+              <span class="timeline-label">Opacity</span>
+              <div class="timeline-bar">
+                <div class="timeline-fill" style="width:80%; background: linear-gradient(90deg, #f0924d, #f0c94d)">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- dots -->
-    <div class="dots" id="dots"></div>
-    <!-- counter -->
-    <div class="counter" id="counter"></div>
+    <!-- Sidebar Resizer -->
+    <div id="sidebar-resizer"></div>
 
+    <!-- MAIN -->
+    <div id="main">
+
+      <!-- EDITOR TABS -->
+      <div id="editor-tabs">
+        <div class="editor-tab active" id="tab-AnimationController" onclick="switchEditorTab('AnimationController')">
+          <i class="fa-solid fa-scroll" style="font-size:10px;color:#f0c94d"></i>
+          AnimationController
+          <div class="tab-close" onclick="closeTab(event,'AnimationController')"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="editor-tab" id="tab-UIManager" onclick="switchEditorTab('UIManager')">
+          <div class="tab-dot"></div>
+          UIManager
+          <div class="tab-close" onclick="closeTab(event,'UIManager')"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="editor-tab" id="tab-TweenHelper" onclick="switchEditorTab('TweenHelper')">
+          <i class="fa-solid fa-scroll" style="font-size:10px;color:#3dd6b5"></i>
+          TweenHelper
+          <div class="tab-close" onclick="closeTab(event,'TweenHelper')"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+      </div>
+
+      <!-- WORK AREA -->
+      <div id="work-area">
+
+        <!-- EDITOR PANEL -->
+        <div id="editor-panel">
+
+          <!-- Search Bar -->
+          <div id="search-bar">
+            <div class="sb-row">
+              <button class="sb-toggle active" id="sb-cs-btn" title="Case sensitive" onclick="toggleSbOption('cs')"><i class="fa-solid fa-a" style="font-size:9px">a</i></button>
+              <button class="sb-toggle" id="sb-rx-btn" title="Regex" onclick="toggleSbOption('rx')">.*</button>
+              <input class="sb-input" id="sb-find" placeholder="Find..." oninput="doSearch()">
+              <button class="sb-btn" onclick="searchPrev()"><i class="fa-solid fa-chevron-up"></i></button>
+              <button class="sb-btn" onclick="searchNext()"><i class="fa-solid fa-chevron-down"></i></button>
+              <span class="sb-count" id="sb-count">0 / 0</span>
+              <button class="sb-btn" onclick="toggleSearch()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="sb-row">
+              <input class="sb-input" id="sb-replace" placeholder="Replace...">
+              <button class="sb-btn" onclick="replaceOne()">Replace</button>
+              <button class="sb-btn" onclick="replaceAll()">Replace All</button>
+            </div>
+          </div>
+
+          <!-- Editor -->
+          <div id="editor-wrapper">
+            <div id="line-numbers" id="line-numbers"></div>
+            <textarea id="code-editor" spellcheck="false" autocorrect="off" autocapitalize="off"
+            oninput="onCodeChange()" onkeydown="onKeyDown(event)" onscroll="syncScroll()"
+            onclick="hideAutocomplete()" onfocus="onEditorFocus()"></textarea>
+            <div id="highlight-overlay"></div>
+            <div id="autocomplete"></div>
+          </div>
+
+          <!-- Status bar -->
+          <div id="status-bar">
+            <span class="sb-item ok"><i class="fa-solid fa-circle-check"></i> Lua 5.1</span>
+            <span class="sb-item" id="status-pos">Ln 1, Col 1</span>
+            <span class="sb-item" id="status-words">0 words</span>
+            <span class="sb-item ok"><i class="fa-solid fa-check"></i> No errors</span>
+            <span style="margin-left:auto; display:flex; gap:10px;">
+            <span class="sb-item"><i class="fa-solid fa-indent"></i> 4</span>
+            <span class="sb-item">UTF-8</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Resize Handle -->
+        <div id="resize-handle"></div>
+
+        <!-- PREVIEW PANEL -->
+        <div id="preview-panel">
+          <div id="preview-header">
+            <i class="fa-solid fa-display" style="color:var(--accent)"></i>
+            <span class="ph-title">Preview — StarterGui</span>
+            <button class="ph-btn" onclick="resetPreview()" title="Reset view"><i class="fa-solid fa-arrows-to-dot"></i></button>
+            <button class="ph-btn" onclick="togglePreviewMode()" title="Fullscreen" id="preview-fs-btn"><i class="fa-solid fa-expand"></i></button>
+          </div>
+
+          <div id="preview-viewport" id="preview-viewport">
+            <div id="preview-bg"></div>
+            <div id="preview-canvas">
+              <!-- MainFrame -->
+              <div class="preview-ui-el" id="el-MainFrame"
+                style="left:50px;top:60px;width:320px;height:220px;background:rgba(15,20,35,0.92);border-radius:12px;border:1.5px solid rgba(91,141,239,0.3);"
+                onmousedown="startDrag(event,this)" ontouchstart="startDrag(event,this)">
+                <div style="padding:16px">
+                  <div
+                    style="font-size:14px;font-weight:700;color:#e8eaf2;margin-bottom:10px;font-family:'Syne',sans-serif">
+                    Game Menu</div>
+                  <div
+                    style="width:100%;height:36px;background:linear-gradient(135deg,#5b8def,#7c6af5);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-family:'Syne',sans-serif;font-weight:700;margin-bottom:8px">
+                    PLAY</div>
+                  <div
+                    style="width:100%;height:36px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#b8bdcc;font-family:'Syne',sans-serif;font-weight:600;margin-bottom:8px">
+                    SETTINGS</div>
+                  <div style="width:100%;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden">
+                    <div
+                      style="width:65%;height:100%;background:linear-gradient(90deg,#4dc97e,#3dd6b5);border-radius:4px">
+                    </div>
+                  </div>
+                </div>
+                <div class="resize-handle" onmousedown="startResize(event,this.parentElement)"
+                  ontouchstart="startResize(event,this.parentElement)"></div>
+              </div>
+              <!-- Health bar element -->
+              <div class="preview-ui-el" id="el-HealthBar"
+                style="left:20px;top:20px;width:200px;height:28px;background:rgba(10,20,15,0.85);border-radius:6px;border:1px solid rgba(77,201,126,0.3);"
+                onmousedown="startDrag(event,this)" ontouchstart="startDrag(event,this)">
+                <div style="padding:6px 10px;display:flex;align-items:center;gap:6px;">
+                  <i class="fa-solid fa-heart" style="color:#f05d6a;font-size:10px"></i>
+                  <div style="flex:1;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden">
+                    <div
+                      style="width:72%;height:100%;background:linear-gradient(90deg,#4dc97e,#3dd6b5);border-radius:4px">
+                    </div>
+                  </div>
+                  <span style="font-size:10px;color:#4dc97e;font-family:'JetBrains Mono',monospace">72%</span>
+                </div>
+                <div class="resize-handle" onmousedown="startResize(event,this.parentElement)"
+                  ontouchstart="startResize(event,this.parentElement)"></div>
+              </div>
+            </div>
+
+            <div id="preview-zoom">100%</div>
+            <div id="preview-controls">
+              <button class="pv-ctrl" onclick="zoomIn()" title="Zoom in"><i class="fa-solid fa-plus"></i></button>
+              <button class="pv-ctrl" onclick="zoomOut()" title="Zoom out"><i class="fa-solid fa-minus"></i></button>
+              <button class="pv-ctrl" onclick="resetPreview()" title="Reset"><i class="fa-solid fa-house"></i></button>
+            </div>
+          </div>
+
+          <!-- Properties panel -->
+          <div id="properties-panel">
+            <div class="prop-header"><i class="fa-solid fa-sliders"></i> Properties —
+              <span id="prop-name">MainFrame</span></div>
+            <div class="prop-row"><span class="prop-key">Name</span><input class="prop-val" value="MainFrame" onchange="updatePropName(this)">
+            </div>
+            <div class="prop-row"><span class="prop-key">Size</span><input class="prop-val" value="{0.4,0},{0.35,0}">
+            </div>
+            <div class="prop-row"><span class="prop-key">Position</span><input class="prop-val" value="{0.3,0},{0.3,0}">
+            </div>
+            <div class="prop-row"><span class="prop-key">BackgroundColor</span><input class="prop-val" value="Color3.fromRGB(15,20,35)">
+            </div>
+            <div class="prop-row"><span class="prop-key">BackgroundTransparency</span><input class="prop-val" value="0.08">
+            </div>
+            <div class="prop-row"><span class="prop-key">BorderSizePixel</span><input class="prop-val" value="0"></div>
+            <div class="prop-row"><span class="prop-key">ZIndex</span><input class="prop-val" value="10"></div>
+            <div class="prop-row"><span class="prop-key">Visible</span><input class="prop-val" value="true"></div>
+            <div class="prop-row"><span class="prop-key">ClipsDescendants</span><input class="prop-val" value="true">
+            </div>
+            <div class="prop-row"><span class="prop-key">CornerRadius</span><input class="prop-val" value="12"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM PANEL -->
+      <div id="bottom-panel">
+        <div id="bottom-tabs">
+          <button class="btm-tab active" onclick="switchBottomTab('output',this)">
+          <i class="fa-solid fa-terminal"></i> Output
+        </button>
+          <button class="btm-tab" onclick="switchBottomTab('errors',this)">
+          <i class="fa-solid fa-triangle-exclamation"></i> Errors <span style="background:var(--red);color:#fff;border-radius:3px;padding:0 4px;font-size:10px;margin-left:2px">0</span>
+        </button>
+          <button class="btm-tab" onclick="switchBottomTab('snippets',this)">
+          <i class="fa-solid fa-code"></i> Snippets
+        </button>
+          <button class="btm-tab" onclick="switchBottomTab('docs',this)">
+          <i class="fa-solid fa-book"></i> Docs
+        </button>
+        </div>
+        <div id="bottom-content">
+          <div id="panel-output">
+            <div class="log-line">
+              <span class="log-time">00:00</span><span class="log-icon"><i class="fa-solid fa-info-circle" style="color:var(--accent)"></i></span><span class="log-info">RblxUI Studio initialized</span>
+            </div>
+            <div class="log-line">
+              <span class="log-time">00:00</span><span class="log-icon"><i class="fa-solid fa-check-circle" style="color:var(--green)"></i></span><span class="log-success">Lua 5.1 engine ready</span>
+            </div>
+            <div class="log-line">
+              <span class="log-time">00:00</span><span class="log-icon"><i class="fa-solid fa-circle" style="color:var(--accent2)"></i></span><span class="log-info">Loaded AnimationController · UIManager · TweenHelper</span>
+            </div>
+          </div>
+          <div id="panel-errors" style="display:none"></div>
+          <div id="panel-snippets" style="display:none">
+            <div style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 0;">
+              <span class="anim-chip" onclick="insertSnippet('tween')"><i class="fa-solid fa-code"></i> TweenService</span>
+              <span class="anim-chip" onclick="insertSnippet('uicorner')"><i class="fa-solid fa-code"></i> UICorner</span>
+              <span class="anim-chip" onclick="insertSnippet('uistroke')"><i class="fa-solid fa-code"></i> UIStroke</span>
+              <span class="anim-chip" onclick="insertSnippet('uilistlayout')"><i class="fa-solid fa-code"></i> UIListLayout</span>
+              <span class="anim-chip" onclick="insertSnippet('remotevent')"><i class="fa-solid fa-code"></i> RemoteEvent</span>
+              <span class="anim-chip" onclick="insertSnippet('clickdetect')"><i class="fa-solid fa-code"></i> Click Detect</span>
+              <span class="anim-chip" onclick="insertSnippet('mouseenter')"><i class="fa-solid fa-code"></i> MouseEnter</span>
+              <span class="anim-chip" onclick="insertSnippet('touchbutton')"><i class="fa-solid fa-code"></i> Touch Button</span>
+            </div>
+          </div>
+          <div id="panel-docs" style="display:none">
+            <div
+              style="padding:8px;font-size:12px;color:var(--text1);line-height:1.7;font-family:'JetBrains Mono',monospace;">
+              <div style="color:var(--accent);font-weight:700;margin-bottom:4px">TweenService</div>
+              <div>game:GetService("TweenService"):Create(instance, TweenInfo.new(duration, style, direction), {Property
+                = Value}):Play()</div>
+              <div style="margin-top:8px;color:var(--accent);font-weight:700;margin-bottom:4px">EasingStyles</div>
+              <div style="color:var(--text2)">Linear · Quad · Cubic · Quart · Quint · Sine · Back · Bounce · Elastic ·
+                Exponential · Circular</div>
+              <div style="margin-top:8px;color:var(--accent);font-weight:700;margin-bottom:4px">EasingDirections</div>
+              <div style="color:var(--text2)">In · Out · InOut</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
-<div class="hint">← → keys</div>
+  <!-- CONTEXT MENU -->
+  <div id="ctx-menu">
+    <div class="ctx-item" onclick="ctxAction('rename')"><i class="fa-solid fa-pencil"></i> Rename
+      <span class="ctx-kbd">F2</span></div>
+    <div class="ctx-item" onclick="ctxAction('duplicate')"><i class="fa-solid fa-copy"></i> Duplicate
+      <span class="ctx-kbd">Ctrl+D</span></div>
+    <div class="ctx-item" onclick="ctxAction('addchild')"><i class="fa-solid fa-plus"></i> Add Child</div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item" onclick="ctxAction('copy')"><i class="fa-solid fa-clone"></i> Copy
+      <span class="ctx-kbd">Ctrl+C</span></div>
+    <div class="ctx-item" onclick="ctxAction('paste')"><i class="fa-solid fa-paste"></i> Paste
+      <span class="ctx-kbd">Ctrl+V</span></div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item danger" onclick="ctxAction('delete')"><i class="fa-solid fa-trash"></i> Delete
+      <span class="ctx-kbd">Del</span></div>
+  </div>
 
-<script>
-  // ── CONFIG ─────────────────────────────────────────────────────────────────
-  // Images are listed in images/manifest.json as an array of filenames.
-  // Example manifest.json:  ["photo1.jpg","cat.png","sunset.webp"]
-  // A helper generate_manifest.py is included to auto-build this file.
-  const IMAGES_FOLDER = 'images/';
-  const MANIFEST      = IMAGES_FOLDER + 'manifest.json';
+  <!-- UPLOAD MODAL -->
+  <div class="modal-backdrop" id="upload-modal">
+    <div class="modal">
+      <div class="modal-title"><i class="fa-solid fa-upload"></i> Import UI</div>
+      <div class="modal-desc">Import a Figma export (JSON), an existing Roblox UI XML, or paste raw JSON.</div>
+      <div class="upload-zone" id="upload-zone" onclick="triggerFileInput()" ondragover="onDragOver(event)"
+        ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <p>Drop file here or click to browse</p>
+        <span>Figma JSON · Roblox RBXMX · Plain JSON</span>
+      </div>
+      <input type="file" id="file-input" style="display:none" accept=".json,.rbxmx,.xml" onchange="onFileSelected(event)">
+      <div style="margin-top:12px;font-size:11px;color:var(--text3)">Or paste JSON below:</div>
+      <textarea class="modal-input" id="paste-json" style="height:80px;width:100%;margin-top:6px;resize:vertical;padding:8px;line-height:1.5;font-size:11px" placeholder='{"type":"Frame","name":"MyFrame",...}'></textarea>
+      <div class="modal-btns">
+        <button class="modal-btn" onclick="closeModal('upload-modal')">Cancel</button>
+        <button class="modal-btn primary" onclick="importUI()">Import</button>
+      </div>
+    </div>
+  </div>
 
-  // ── STATE ──────────────────────────────────────────────────────────────────
-  let images  = [];
-  let current = 0;
-  let busy    = false;
+  <!-- EXPORT MODAL -->
+  <div class="modal-backdrop" id="export-modal">
+    <div class="modal" style="width:min(600px,95vw)">
+      <div class="modal-title"><i class="fa-solid fa-terminal"></i> Export to Roblox Studio</div>
+      <div class="modal-desc">Copy this command and paste it into the <strong>Command Bar</strong> in Roblox Studio. It
+        will create all UI elements inside
+        <code style="background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:'JetBrains Mono',monospace">StarterGui</code>.
+      </div>
+      <div class="export-code" id="export-code-block"></div>
+      <div class="modal-btns">
+        <button class="modal-btn" onclick="closeModal('export-modal')">Close</button>
+        <button class="modal-btn primary" onclick="copyExportCode()"><i class="fa-solid fa-copy"></i> Copy Command</button>
+      </div>
+    </div>
+  </div>
 
-  // ── ELEMENTS ───────────────────────────────────────────────────────────────
-  const pic      = document.getElementById('pic');
-  const counter  = document.getElementById('counter');
-  const dotsEl   = document.getElementById('dots');
-  const caption  = document.getElementById('caption');
-  const emptyMsg = document.getElementById('emptyMsg');
-  const btnPrev  = document.getElementById('btnPrev');
-  const btnNext  = document.getElementById('btnNext');
+  <!-- TOAST -->
+  <div id="toast"><i class="fa-solid fa-check"></i> <span id="toast-msg">Done</span></div>
 
-  // ── LOAD MANIFEST ──────────────────────────────────────────────────────────
-  fetch(MANIFEST)
-    .then(r => r.json())
-    .then(list => {
-      images = list.filter(Boolean);
-      if (images.length) {
-        emptyMsg.style.display = 'none';
-        buildDots();
-        showImage(0, null);
+  <script>
+    // ─────────────────────────────────────────────
+// SCRIPT FILES
+// ─────────────────────────────────────────────
+const SCRIPTS = {
+  AnimationController: `-- AnimationController (LocalScript)
+-- Place in StarterGui > ScreenGui
+
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Reference to the ScreenGui
+local screenGui = playerGui:WaitForChild("ScreenGui")
+local mainFrame = screenGui:WaitForChild("MainFrame")
+local playButton = mainFrame:WaitForChild("PlayButton")
+local closeButton = mainFrame:WaitForChild("CloseButton")
+local healthBar = screenGui:WaitForChild("HealthBar")
+
+-- Tween configurations
+local function createTweenInfo(duration, style, direction)
+    return TweenInfo.new(
+        duration,
+        Enum.EasingStyle[style],
+        Enum.EasingDirection[direction]
+    )
+end
+
+-- ── FADE IN ──────────────────────────────────
+local function fadeIn(element, duration)
+    duration = duration or 0.3
+    element.BackgroundTransparency = 1
+    element.Visible = true
+    local tween = TweenService:Create(
+        element,
+        createTweenInfo(duration, "Quad", "Out"),
+        { BackgroundTransparency = 0.08 }
+    )
+    tween:Play()
+    return tween
+end
+
+-- ── FADE OUT ─────────────────────────────────
+local function fadeOut(element, duration)
+    duration = duration or 0.3
+    local tween = TweenService:Create(
+        element,
+        createTweenInfo(duration, "Quad", "In"),
+        { BackgroundTransparency = 1 }
+    )
+    tween:Play()
+    tween.Completed:Connect(function()
+        element.Visible = false
+    end)
+    return tween
+end
+
+-- ── SLIDE IN FROM BOTTOM ──────────────────────
+local function slideIn(element, duration)
+    duration = duration or 0.4
+    local targetPos = element.Position
+    element.Position = UDim2.new(
+        targetPos.X.Scale, targetPos.X.Offset,
+        targetPos.Y.Scale + 0.15, targetPos.Y.Offset
+    )
+    element.Visible = true
+    local tween = TweenService:Create(
+        element,
+        createTweenInfo(duration, "Back", "Out"),
+        { Position = targetPos }
+    )
+    tween:Play()
+    return tween
+end
+
+-- ── BOUNCE SCALE ──────────────────────────────
+local function bounceScale(element)
+    local originalSize = element.Size
+    local bigSize = UDim2.new(
+        originalSize.X.Scale * 1.1, originalSize.X.Offset,
+        originalSize.Y.Scale * 1.1, originalSize.Y.Offset
+    )
+    TweenService:Create(element,
+        createTweenInfo(0.12, "Back", "Out"),
+        { Size = bigSize }
+    ):Play()
+    task.delay(0.12, function()
+        TweenService:Create(element,
+            createTweenInfo(0.18, "Elastic", "Out"),
+            { Size = originalSize }
+        ):Play()
+    end)
+end
+
+-- ── BUTTON HOVER EFFECTS ──────────────────────
+playButton.MouseEnter:Connect(function()
+    TweenService:Create(playButton,
+        createTweenInfo(0.15, "Quad", "Out"),
+        { BackgroundColor3 = Color3.fromRGB(100, 160, 255) }
+    ):Play()
+end)
+playButton.MouseLeave:Connect(function()
+    TweenService:Create(playButton,
+        createTweenInfo(0.15, "Quad", "Out"),
+        { BackgroundColor3 = Color3.fromRGB(91, 141, 239) }
+    ):Play()
+end)
+
+-- ── BUTTON CLICK ──────────────────────────────
+playButton.MouseButton1Click:Connect(function()
+    bounceScale(playButton)
+    fadeOut(mainFrame, 0.3)
+    task.delay(0.5, function()
+        print("Game started!")
+    end)
+end)
+
+closeButton.MouseButton1Click:Connect(function()
+    bounceScale(closeButton)
+    fadeOut(mainFrame, 0.25)
+end)
+
+-- ── INIT ANIMATION ───────────────────────────
+task.wait(0.5)
+slideIn(mainFrame, 0.45)
+fadeIn(healthBar, 0.6)`,
+
+  UIManager: `-- UIManager (LocalScript)
+-- Manages UI state and transitions
+
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local UIManager = {}
+UIManager.__index = UIManager
+
+function UIManager.new(gui)
+    local self = setmetatable({}, UIManager)
+    self.gui = gui
+    self.activeScreens = {}
+    self.history = {}
+    return self
+end
+
+function UIManager:show(screenName, transition)
+    transition = transition or "fade"
+    local screen = self.gui:FindFirstChild(screenName)
+    if not screen then
+        warn("Screen not found: " .. screenName)
+        return
+    end
+
+    if transition == "fade" then
+        screen.BackgroundTransparency = 1
+        screen.Visible = true
+        TweenService:Create(screen,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            { BackgroundTransparency = 0 }
+        ):Play()
+    elseif transition == "slide" then
+        screen.Position = UDim2.new(1, 0, 0, 0)
+        screen.Visible = true
+        TweenService:Create(screen,
+            TweenInfo.new(0.35, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
+            { Position = UDim2.new(0, 0, 0, 0) }
+        ):Play()
+    end
+
+    table.insert(self.history, screenName)
+    self.activeScreens[screenName] = true
+end
+
+function UIManager:hide(screenName, transition)
+    transition = transition or "fade"
+    local screen = self.gui:FindFirstChild(screenName)
+    if not screen then return end
+
+    if transition == "fade" then
+        local t = TweenService:Create(screen,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+            { BackgroundTransparency = 1 }
+        )
+        t:Play()
+        t.Completed:Connect(function() screen.Visible = false end)
+    end
+
+    self.activeScreens[screenName] = nil
+end
+
+function UIManager:back()
+    if #self.history > 1 then
+        local current = table.remove(self.history)
+        self:hide(current, "slide")
+        self:show(self.history[#self.history], "fade")
+    end
+end
+
+-- Input handling for mobile/tablet
+UserInputService.TouchStarted:Connect(function(touch, processed)
+    if not processed then
+        -- Handle touch gestures
+    end
+end)
+
+return UIManager`,
+
+  TweenHelper: `-- TweenHelper (ModuleScript)
+-- Reusable tween utilities for UI animations
+
+local TweenService = game:GetService("TweenService")
+
+local TweenHelper = {}
+
+-- Shorthand tween creator
+function TweenHelper.tween(instance, props, duration, style, direction, loops, reverse)
+    local info = TweenInfo.new(
+        duration or 0.3,
+        Enum.EasingStyle[style or "Quad"],
+        Enum.EasingDirection[direction or "Out"],
+        loops or 0,
+        reverse or false,
+        0
+    )
+    local t = TweenService:Create(instance, info, props)
+    t:Play()
+    return t
+end
+
+-- Pulse animation (loops)
+function TweenHelper.pulse(element, scale, speed)
+    scale = scale or 1.05
+    speed = speed or 0.8
+    local orig = element.Size
+    local big = UDim2.new(
+        orig.X.Scale * scale, orig.X.Offset,
+        orig.Y.Scale * scale, orig.Y.Offset
+    )
+    TweenService:Create(element,
+        TweenInfo.new(speed, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
+        { Size = big }
+    ):Play()
+end
+
+-- Rainbow color cycle
+function TweenHelper.rainbow(element, speed)
+    speed = speed or 2
+    local hue = 0
+    local connection
+    connection = game:GetService("RunService").Heartbeat:Connect(function(dt)
+        hue = (hue + dt / speed) % 1
+        element.BackgroundColor3 = Color3.fromHSV(hue, 0.8, 1)
+    end)
+    return connection
+end
+
+-- Typewriter text effect
+function TweenHelper.typewriter(label, text, speed)
+    speed = speed or 0.05
+    label.Text = ""
+    local i = 0
+    local function next()
+        i = i + 1
+        if i <= #text then
+            label.Text = string.sub(text, 1, i)
+            task.delay(speed, next)
+        end
+    end
+    next()
+end
+
+-- Shake effect
+function TweenHelper.shake(element, intensity, duration)
+    intensity = intensity or 5
+    duration = duration or 0.4
+    local origPos = element.Position
+    local elapsed = 0
+    local connection
+    connection = game:GetService("RunService").Heartbeat:Connect(function(dt)
+        elapsed = elapsed + dt
+        if elapsed >= duration then
+            element.Position = origPos
+            connection:Disconnect()
+            return
+        end
+        local factor = 1 - (elapsed / duration)
+        local ox = math.random(-intensity, intensity) * factor
+        local oy = math.random(-intensity, intensity) * factor
+        element.Position = UDim2.new(
+            origPos.X.Scale, origPos.X.Offset + ox,
+            origPos.Y.Scale, origPos.Y.Offset + oy
+        )
+    end)
+end
+
+-- Spring animation
+function TweenHelper.spring(element, targetSize, duration)
+    TweenService:Create(element,
+        TweenInfo.new(duration or 0.5, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out),
+        { Size = targetSize }
+    ):Play()
+end
+
+return TweenHelper`
+};
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let currentFile = 'AnimationController';
+let searchState = { matches: [], current: 0, caseSensitive: true, regex: false };
+let acIndex = 0;
+let pvScale = 1, pvX = 0, pvY = 0;
+let pvDragging = false, pvDragStartX = 0, pvDragStartY = 0;
+let elDragging = null, elDragOffX = 0, elDragOffY = 0;
+let elResizing = null, elResizeStartW = 0, elResizeStartH = 0, elResizeStartX = 0, elResizeStartY = 0;
+let selectedEl = null;
+
+// ─────────────────────────────────────────────
+// EDITOR INIT
+// ─────────────────────────────────────────────
+const editor = document.getElementById('code-editor');
+const lineNumbers = document.getElementById('line-numbers');
+const autocomplete = document.getElementById('autocomplete');
+
+function initEditor() {
+  editor.value = SCRIPTS[currentFile];
+  updateLineNumbers();
+  updateStatus();
+}
+
+function updateLineNumbers() {
+  const lines = editor.value.split('\n').length;
+  let html = '';
+  for (let i = 1; i <= lines; i++) html += i + '\n';
+  lineNumbers.textContent = html;
+}
+
+function syncScroll() {
+  lineNumbers.scrollTop = editor.scrollTop;
+  document.getElementById('highlight-overlay').scrollTop = editor.scrollTop;
+  document.getElementById('highlight-overlay').scrollLeft = editor.scrollLeft;
+}
+
+function onCodeChange() {
+  updateLineNumbers();
+  updateStatus();
+  triggerAutocomplete();
+  if (searchState.matches.length) doSearch();
+  const tab = document.getElementById('tab-' + currentFile);
+  if (tab && !tab.querySelector('.tab-dot')) {
+    const dot = document.createElement('div');
+    dot.className = 'tab-dot';
+    tab.insertBefore(dot, tab.firstChild);
+  }
+}
+
+function updateStatus() {
+  const val = editor.value;
+  const pos = editor.selectionStart;
+  const lines = val.substr(0, pos).split('\n');
+  document.getElementById('status-pos').textContent =
+    `Ln ${lines.length}, Col ${lines[lines.length-1].length + 1}`;
+  const words = val.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('status-words').textContent = `${words} words`;
+}
+
+// ─────────────────────────────────────────────
+// AUTOCOMPLETE
+// ─────────────────────────────────────────────
+const AC_ITEMS = [
+  { label: 'TweenService', type: 'Service', icon: 'fa-cog' },
+  { label: 'TweenInfo.new', type: 'Constructor', icon: 'fa-circle-plus' },
+  { label: 'TweenService:Create', type: 'Method', icon: 'fa-function' },
+  { label: 'game:GetService', type: 'Method', icon: 'fa-server' },
+  { label: 'task.wait', type: 'Function', icon: 'fa-clock' },
+  { label: 'task.delay', type: 'Function', icon: 'fa-clock' },
+  { label: 'task.spawn', type: 'Function', icon: 'fa-bolt' },
+  { label: 'Enum.EasingStyle.Quad', type: 'Enum', icon: 'fa-list' },
+  { label: 'Enum.EasingStyle.Bounce', type: 'Enum', icon: 'fa-list' },
+  { label: 'Enum.EasingStyle.Elastic', type: 'Enum', icon: 'fa-list' },
+  { label: 'Enum.EasingStyle.Back', type: 'Enum', icon: 'fa-list' },
+  { label: 'Enum.EasingStyle.Sine', type: 'Enum', icon: 'fa-list' },
+  { label: 'Enum.EasingStyle.Cubic', type: 'Enum', icon: 'fa-list' },
+  { label: 'Enum.EasingStyle.Linear', type: 'Enum', icon: 'fa-list' },
+  { label: 'Enum.EasingDirection.In', type: 'Enum', icon: 'fa-list' },
+  { label: 'Enum.EasingDirection.Out', type: 'Enum', icon: 'fa-list' },
+  { label: 'Enum.EasingDirection.InOut', type: 'Enum', icon: 'fa-list' },
+  { label: 'UDim2.new', type: 'Constructor', icon: 'fa-circle-plus' },
+  { label: 'Color3.fromRGB', type: 'Constructor', icon: 'fa-palette' },
+  { label: 'Color3.fromHSV', type: 'Constructor', icon: 'fa-palette' },
+  { label: 'Vector2.new', type: 'Constructor', icon: 'fa-circle-plus' },
+  { label: 'Vector3.new', type: 'Constructor', icon: 'fa-circle-plus' },
+  { label: 'Players.LocalPlayer', type: 'Property', icon: 'fa-user' },
+  { label: 'RunService.Heartbeat', type: 'Event', icon: 'fa-heart-pulse' },
+  { label: 'UserInputService', type: 'Service', icon: 'fa-keyboard' },
+  { label: 'Instance.new', type: 'Constructor', icon: 'fa-circle-plus' },
+  { label: 'math.random', type: 'Function', icon: 'fa-function' },
+  { label: 'math.floor', type: 'Function', icon: 'fa-function' },
+  { label: 'math.clamp', type: 'Function', icon: 'fa-function' },
+  { label: 'string.format', type: 'Function', icon: 'fa-function' },
+  { label: 'table.insert', type: 'Function', icon: 'fa-function' },
+  { label: 'table.remove', type: 'Function', icon: 'fa-function' },
+  { label: 'coroutine.wrap', type: 'Function', icon: 'fa-function' },
+  { label: 'pcall', type: 'Function', icon: 'fa-shield' },
+  { label: 'warn', type: 'Function', icon: 'fa-triangle-exclamation' },
+  { label: 'print', type: 'Function', icon: 'fa-terminal' },
+  { label: 'local', type: 'Keyword', icon: 'fa-key' },
+  { label: 'function', type: 'Keyword', icon: 'fa-key' },
+  { label: 'return', type: 'Keyword', icon: 'fa-key' },
+  { label: 'if', type: 'Keyword', icon: 'fa-key' },
+  { label: 'then', type: 'Keyword', icon: 'fa-key' },
+  { label: 'else', type: 'Keyword', icon: 'fa-key' },
+  { label: 'end', type: 'Keyword', icon: 'fa-key' },
+  { label: 'for', type: 'Keyword', icon: 'fa-key' },
+  { label: 'while', type: 'Keyword', icon: 'fa-key' },
+  { label: 'do', type: 'Keyword', icon: 'fa-key' },
+  { label: 'repeat', type: 'Keyword', icon: 'fa-key' },
+  { label: 'until', type: 'Keyword', icon: 'fa-key' },
+  { label: 'not', type: 'Keyword', icon: 'fa-key' },
+  { label: 'and', type: 'Keyword', icon: 'fa-key' },
+  { label: 'or', type: 'Keyword', icon: 'fa-key' },
+  { label: 'true', type: 'Value', icon: 'fa-check' },
+  { label: 'false', type: 'Value', icon: 'fa-xmark' },
+  { label: 'nil', type: 'Value', icon: 'fa-circle' },
+];
+
+let acTimeout = null;
+function triggerAutocomplete() {
+  clearTimeout(acTimeout);
+  acTimeout = setTimeout(() => {
+    const pos = editor.selectionStart;
+    const text = editor.value.substr(0, pos);
+    const match = text.match(/[\w.:]+$/);
+    if (!match || match[0].length < 2) { hideAutocomplete(); return; }
+    const word = match[0].toLowerCase();
+    const filtered = AC_ITEMS.filter(i => i.label.toLowerCase().includes(word)).slice(0, 12);
+    if (!filtered.length) { hideAutocomplete(); return; }
+    showAutocomplete(filtered, match[0]);
+  }, 120);
+}
+
+function showAutocomplete(items, word) {
+  autocomplete.innerHTML = '';
+  items.forEach((item, idx) => {
+    const div = document.createElement('div');
+    div.className = 'ac-item' + (idx === 0 ? ' selected' : '');
+    div.innerHTML = `<span class="ac-icon"><i class="fa-solid ${item.icon}"></i></span>${item.label}<span class="ac-type">${item.type}</span>`;
+    div.onclick = () => applyAutocomplete(item.label, word);
+    autocomplete.appendChild(div);
+  });
+  acIndex = 0;
+
+  const rect = editor.getBoundingClientRect();
+  const lineH = 22;
+  const pos = editor.selectionStart;
+  const lines = editor.value.substr(0, pos).split('\n');
+  const lineNum = lines.length - 1;
+  const colNum = lines[lines.length-1].length;
+  const top = rect.top + (lineNum - editor.scrollTop/lineH) * lineH + lineH + 10;
+  const left = rect.left + 48 + colNum * 7.8;
+
+  autocomplete.style.top = Math.min(top, window.innerHeight - 220) + 'px';
+  autocomplete.style.left = Math.min(left, window.innerWidth - 260) + 'px';
+  autocomplete.style.display = 'block';
+}
+
+function hideAutocomplete() {
+  autocomplete.style.display = 'none';
+  acIndex = 0;
+}
+
+function applyAutocomplete(label, word) {
+  const pos = editor.selectionStart;
+  const before = editor.value.substr(0, pos - word.length);
+  const after = editor.value.substr(pos);
+  editor.value = before + label + after;
+  editor.selectionStart = editor.selectionEnd = before.length + label.length;
+  hideAutocomplete();
+  onCodeChange();
+  editor.focus();
+}
+
+// ─────────────────────────────────────────────
+// KEYBOARD SHORTCUTS
+// ─────────────────────────────────────────────
+function onKeyDown(e) {
+  const ac = autocomplete.style.display !== 'none';
+
+  if (ac) {
+    const items = autocomplete.querySelectorAll('.ac-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      items[acIndex]?.classList.remove('selected');
+      acIndex = (acIndex + 1) % items.length;
+      items[acIndex]?.classList.add('selected');
+      return;
+    }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      items[acIndex]?.classList.remove('selected');
+      acIndex = (acIndex - 1 + items.length) % items.length;
+      items[acIndex]?.classList.add('selected');
+      return;
+    }
+    if (e.key === 'Tab' || e.key === 'Enter') {
+      e.preventDefault();
+      const sel = autocomplete.querySelector('.selected');
+      if (sel) sel.click();
+      return;
+    }
+    if (e.key === 'Escape') { hideAutocomplete(); return; }
+  }
+
+  // Tab = 4 spaces
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s = editor.selectionStart, en = editor.selectionEnd;
+    if (e.shiftKey) {
+      const before = editor.value.substr(0, s);
+      const lineStart = before.lastIndexOf('\n') + 1;
+      if (editor.value.substr(lineStart, 4) === '    ') {
+        editor.value = editor.value.substr(0,lineStart) + editor.value.substr(lineStart+4);
+        editor.selectionStart = editor.selectionEnd = Math.max(s - 4, lineStart);
       }
-    })
-    .catch(() => {
-      emptyMsg.textContent = 'add images to images/ and run generate_manifest.py';
-    });
-
-  // ── BUILD DOT STRIP ────────────────────────────────────────────────────────
-  function buildDots() {
-    dotsEl.innerHTML = '';
-    // show dots only if ≤ 20 images (otherwise too crowded)
-    if (images.length > 20) return;
-    images.forEach((_, i) => {
-      const d = document.createElement('div');
-      d.className = 'dot' + (i === 0 ? ' active' : '');
-      d.addEventListener('click', () => navigate(i));
-      dotsEl.appendChild(d);
-    });
-  }
-
-  function updateDots(idx) {
-    [...dotsEl.querySelectorAll('.dot')].forEach((d, i) =>
-      d.classList.toggle('active', i === idx)
-    );
-  }
-
-  // ── SHOW IMAGE ─────────────────────────────────────────────────────────────
-  function showImage(idx, direction) {
-    current = (idx + images.length) % images.length;
-    const src  = IMAGES_FOLDER + images[current];
-    const name = images[current].replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
-
-    // animate out old content
-    if (direction && pic.firstElementChild) {
-      const outClass = direction === 'left' ? 'slide-out-left' : 'slide-out-right';
-      const old = pic.firstElementChild;
-      old.classList.add(outClass);
-      old.addEventListener('animationend', () => old.remove(), { once: true });
     } else {
-      pic.innerHTML = '';
+      editor.value = editor.value.substr(0,s) + '    ' + editor.value.substr(en);
+      editor.selectionStart = editor.selectionEnd = s + 4;
     }
-
-    // create new image element
-    const img = document.createElement('img');
-    img.src = src;
-    img.alt = name;
-    if (direction) {
-      img.classList.add(direction === 'left' ? 'slide-in-right' : 'slide-in-left');
-    }
-    pic.appendChild(img);
-
-    counter.textContent = (current + 1) + ' / ' + images.length;
-    caption.textContent = name;
-    updateDots(current);
+    onCodeChange();
+    return;
   }
 
-  // ── NAVIGATE ───────────────────────────────────────────────────────────────
-  function navigate(target) {
-    if (!images.length) return;
-    const direction = target > current ? 'left' : 'right';
-    showImage(target, direction);
+  // Auto-close brackets
+  const pairs = { '(': ')', '[': ']', '{': '}', '"': '"', "'": "'" };
+  if (pairs[e.key] && !e.ctrlKey && !e.metaKey) {
+    const s = editor.selectionStart;
+    const close = pairs[e.key];
+    e.preventDefault();
+    editor.value = editor.value.substr(0,s) + e.key + close + editor.value.substr(s);
+    editor.selectionStart = editor.selectionEnd = s + 1;
+    onCodeChange();
+    return;
   }
 
-  btnPrev.addEventListener('click', () => navigate(current - 1));
-  btnNext.addEventListener('click', () => navigate(current + 1));
+  // Ctrl+/ comment
+  if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+    e.preventDefault();
+    const s = editor.selectionStart;
+    const before = editor.value.substr(0, s);
+    const lineStart = before.lastIndexOf('\n') + 1;
+    const lineEnd = editor.value.indexOf('\n', s);
+    const end = lineEnd === -1 ? editor.value.length : lineEnd;
+    const line = editor.value.substring(lineStart, end);
+    let newLine;
+    if (line.trimStart().startsWith('--')) {
+      newLine = line.replace(/^(\s*)-- ?/, '$1');
+    } else {
+      newLine = line.replace(/^(\s*)/, '$1-- ');
+    }
+    editor.value = editor.value.substr(0, lineStart) + newLine + editor.value.substr(end);
+    editor.selectionStart = editor.selectionEnd = s + (newLine.length - line.length);
+    onCodeChange();
+    return;
+  }
 
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft')  navigate(current - 1);
-    if (e.key === 'ArrowRight') navigate(current + 1);
+  // Ctrl+F
+  if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+    e.preventDefault(); toggleSearch(); return;
+  }
+  // Ctrl+S
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault(); saveCurrentFile(); return;
+  }
+  // Ctrl+Z handled by browser
+  // Ctrl+D duplicate line
+  if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+    e.preventDefault();
+    const s = editor.selectionStart;
+    const before = editor.value.substr(0, s);
+    const lineStart = before.lastIndexOf('\n') + 1;
+    const lineEnd = editor.value.indexOf('\n', s);
+    const end = lineEnd === -1 ? editor.value.length : lineEnd;
+    const line = editor.value.substring(lineStart, end);
+    editor.value = editor.value.substr(0, end) + '\n' + line + editor.value.substr(end);
+    editor.selectionStart = editor.selectionEnd = end + 1 + (s - lineStart);
+    onCodeChange();
+    return;
+  }
+  // Escape
+  if (e.key === 'Escape') { hideAutocomplete(); }
+
+  updateStatus();
+}
+
+function onEditorFocus() { updateStatus(); }
+
+// ─────────────────────────────────────────────
+// SEARCH & REPLACE
+// ─────────────────────────────────────────────
+let sbOpen = false;
+function toggleSearch() {
+  sbOpen = !sbOpen;
+  const bar = document.getElementById('search-bar');
+  bar.classList.toggle('open', sbOpen);
+  if (sbOpen) document.getElementById('sb-find').focus();
+  else { clearHighlights(); searchState.matches = []; }
+}
+
+function toggleSbOption(opt) {
+  if (opt === 'cs') {
+    searchState.caseSensitive = !searchState.caseSensitive;
+    document.getElementById('sb-cs-btn').classList.toggle('active', searchState.caseSensitive);
+  } else {
+    searchState.regex = !searchState.regex;
+    document.getElementById('sb-rx-btn').classList.toggle('active', searchState.regex);
+  }
+  doSearch();
+}
+
+function doSearch() {
+  const query = document.getElementById('sb-find').value;
+  clearHighlights();
+  if (!query) { searchState.matches = []; updateCount(); return; }
+
+  const code = editor.value;
+  const matches = [];
+  try {
+    let rx;
+    if (searchState.regex) {
+      rx = new RegExp(query, searchState.caseSensitive ? 'g' : 'gi');
+    } else {
+      const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      rx = new RegExp(escaped, searchState.caseSensitive ? 'g' : 'gi');
+    }
+    let m;
+    while ((m = rx.exec(code)) !== null) {
+      matches.push({ start: m.index, end: m.index + m[0].length });
+    }
+  } catch(e) {}
+  searchState.matches = matches;
+  if (searchState.current >= matches.length) searchState.current = 0;
+  updateCount();
+  highlightMatches();
+  if (matches.length) scrollToMatch(searchState.current);
+}
+
+function highlightMatches() {
+  const overlay = document.getElementById('highlight-overlay');
+  if (!searchState.matches.length) { overlay.innerHTML = ''; return; }
+  const code = editor.value;
+  let result = '';
+  let last = 0;
+  searchState.matches.forEach((m, i) => {
+    result += escHtml(code.substring(last, m.start));
+    const cls = i === searchState.current ? 'hl-current' : 'hl-match';
+    result += `<span class="${cls}">${escHtml(code.substring(m.start, m.end))}</span>`;
+    last = m.end;
   });
+  result += escHtml(code.substr(last));
+  overlay.innerHTML = result;
+}
 
-  // touch / swipe
-  let touchX = null;
-  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
-  document.addEventListener('touchend', e => {
-    if (touchX === null) return;
-    const dx = e.changedTouches[0].clientX - touchX;
-    if (Math.abs(dx) > 50) navigate(dx < 0 ? current + 1 : current - 1);
-    touchX = null;
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function clearHighlights() {
+  document.getElementById('highlight-overlay').innerHTML = '';
+}
+
+function updateCount() {
+  const c = searchState.matches.length;
+  document.getElementById('sb-count').textContent =
+    c ? `${searchState.current + 1} / ${c}` : '0 / 0';
+}
+
+function searchNext() {
+  if (!searchState.matches.length) return;
+  searchState.current = (searchState.current + 1) % searchState.matches.length;
+  updateCount();
+  highlightMatches();
+  scrollToMatch(searchState.current);
+}
+function searchPrev() {
+  if (!searchState.matches.length) return;
+  searchState.current = (searchState.current - 1 + searchState.matches.length) % searchState.matches.length;
+  updateCount();
+  highlightMatches();
+  scrollToMatch(searchState.current);
+}
+
+function scrollToMatch(idx) {
+  const m = searchState.matches[idx];
+  if (!m) return;
+  editor.selectionStart = m.start;
+  editor.selectionEnd = m.end;
+  editor.focus();
+  const lineH = 22;
+  const line = editor.value.substr(0, m.start).split('\n').length;
+  editor.scrollTop = Math.max(0, (line - 5) * lineH);
+}
+
+function replaceOne() {
+  const m = searchState.matches[searchState.current];
+  if (!m) return;
+  const rep = document.getElementById('sb-replace').value;
+  editor.value = editor.value.substr(0, m.start) + rep + editor.value.substr(m.end);
+  addLog('info', `Replaced 1 occurrence`);
+  doSearch();
+}
+
+function replaceAll() {
+  const query = document.getElementById('sb-find').value;
+  const rep = document.getElementById('sb-replace').value;
+  if (!query) return;
+  const count = searchState.matches.length;
+  let code = editor.value;
+  try {
+    let rx;
+    if (searchState.regex) {
+      rx = new RegExp(query, searchState.caseSensitive ? 'g' : 'gi');
+    } else {
+      const esc = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      rx = new RegExp(esc, searchState.caseSensitive ? 'g' : 'gi');
+    }
+    code = code.replace(rx, rep);
+  } catch(e) {}
+  editor.value = code;
+  onCodeChange();
+  addLog('success', `Replaced ${count} occurrences`);
+  doSearch();
+}
+
+// ─────────────────────────────────────────────
+// FILE MANAGEMENT
+// ─────────────────────────────────────────────
+function saveCurrentFile() {
+  SCRIPTS[currentFile] = editor.value;
+  const tab = document.getElementById('tab-' + currentFile);
+  if (tab) {
+    const dot = tab.querySelector('.tab-dot');
+    if (dot) dot.remove();
+  }
+  showToast('Saved ' + currentFile, 'ok');
+  addLog('success', 'Saved ' + currentFile);
+}
+
+function switchEditorTab(name) {
+  SCRIPTS[currentFile] = editor.value;
+  currentFile = name;
+  editor.value = SCRIPTS[name] || '';
+  document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
+  const tab = document.getElementById('tab-' + name);
+  if (tab) tab.classList.add('active');
+  updateLineNumbers();
+  updateStatus();
+  clearHighlights();
+}
+
+function closeTab(e, name) {
+  e.stopPropagation();
+  const tab = document.getElementById('tab-' + name);
+  if (tab) tab.remove();
+  if (currentFile === name) {
+    const remaining = document.querySelectorAll('.editor-tab');
+    if (remaining.length) {
+      const next = remaining[0].id.replace('tab-', '');
+      switchEditorTab(next);
+    }
+  }
+}
+
+function newFile() {
+  const name = prompt('Script name:');
+  if (!name) return;
+  SCRIPTS[name] = `-- ${name} (LocalScript)\n\nlocal TweenService = game:GetService("TweenService")\n\n`;
+  const tabs = document.getElementById('editor-tabs');
+  const div = document.createElement('div');
+  div.className = 'editor-tab active';
+  div.id = 'tab-' + name;
+  div.innerHTML = `<i class="fa-solid fa-scroll" style="font-size:10px;color:#f0c94d"></i>${name}<div class="tab-close" onclick="closeTab(event,'${name}')"><i class="fa-solid fa-xmark"></i></div>`;
+  div.onclick = () => switchEditorTab(name);
+  tabs.appendChild(div);
+  switchEditorTab(name);
+  addWorkspaceItem(name, 'Script');
+}
+
+function addWorkspaceItem(name, type) {
+  const tree = document.getElementById('workspace-tree');
+  const div = document.createElement('div');
+  div.className = 'tree-item';
+  div.setAttribute('data-name', name);
+  div.innerHTML = `<span class="ti-icon"><i class="fa-solid fa-scroll" style="color:#f0c94d"></i></span><span class="ti-label">${name}</span><span class="ti-badge">${type}</span>`;
+  div.onclick = () => selectItem(div, name);
+  tree.appendChild(div);
+}
+
+// ─────────────────────────────────────────────
+// SIDEBAR
+// ─────────────────────────────────────────────
+function switchSidebarTab(name, btn) {
+  document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-explorer').style.display = name === 'explorer' ? 'block' : 'none';
+  const at = document.getElementById('tab-animations');
+  at.style.display = name === 'animations' ? 'flex' : 'none';
+}
+
+function selectItem(el, name) {
+  document.querySelectorAll('.tree-item').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('prop-name').textContent = name;
+  if (SCRIPTS[name]) switchEditorTab(name);
+}
+
+function filterWorkspace(q) {
+  const items = document.querySelectorAll('.tree-item');
+  q = q.toLowerCase();
+  items.forEach(item => {
+    const label = item.getAttribute('data-name') || '';
+    item.style.display = !q || label.toLowerCase().includes(q) ? '' : 'none';
   });
-</script>
+}
 
+// ─────────────────────────────────────────────
+// PREVIEW – PAN & ZOOM
+// ─────────────────────────────────────────────
+const viewport = document.getElementById('preview-viewport');
+const canvas = document.getElementById('preview-canvas');
+const zoomLabel = document.getElementById('preview-zoom');
+
+function applyTransform() {
+  canvas.style.transform = `translate(${pvX}px,${pvY}px) scale(${pvScale})`;
+  zoomLabel.textContent = Math.round(pvScale * 100) + '%';
+}
+
+function zoomIn() { pvScale = Math.min(pvScale * 1.2, 4); applyTransform(); }
+function zoomOut() { pvScale = Math.max(pvScale / 1.2, 0.2); applyTransform(); }
+function resetPreview() { pvScale = 1; pvX = 0; pvY = 0; applyTransform(); }
+
+// Pinch zoom
+let pinchDist = 0;
+viewport.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) {
+    pinchDist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    e.preventDefault();
+  }
+}, { passive: false });
+viewport.addEventListener('touchmove', e => {
+  if (e.touches.length === 2) {
+    const d = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    pvScale = Math.max(0.2, Math.min(4, pvScale * (d / pinchDist)));
+    pinchDist = d;
+    applyTransform();
+    e.preventDefault();
+  }
+}, { passive: false });
+
+// Pan
+viewport.addEventListener('mousedown', e => {
+  if (e.target === viewport || e.target === document.getElementById('preview-bg') || e.target === canvas) {
+    pvDragging = true; pvDragStartX = e.clientX - pvX; pvDragStartY = e.clientY - pvY;
+    viewport.classList.add('grabbing');
+  }
+});
+viewport.addEventListener('mousemove', e => {
+  if (pvDragging) { pvX = e.clientX - pvDragStartX; pvY = e.clientY - pvDragStartY; applyTransform(); }
+});
+viewport.addEventListener('mouseup', () => { pvDragging = false; viewport.classList.remove('grabbing'); });
+viewport.addEventListener('wheel', e => {
+  e.preventDefault();
+  pvScale = Math.max(0.2, Math.min(4, pvScale * (e.deltaY < 0 ? 1.1 : 0.9)));
+  applyTransform();
+}, { passive: false });
+
+// ─────────────────────────────────────────────
+// ELEMENT DRAG & RESIZE
+// ─────────────────────────────────────────────
+function startDrag(e, el) {
+  if (e.target.classList.contains('resize-handle')) return;
+  e.stopPropagation();
+
+  // Select
+  if (selectedEl) selectedEl.classList.remove('selected');
+  selectedEl = el;
+  el.classList.add('selected');
+  updatePropertiesForEl(el);
+
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  elDragOffX = clientX / pvScale - el.offsetLeft;
+  elDragOffY = clientY / pvScale - el.offsetTop;
+  elDragging = el;
+
+  const move = ev => {
+    if (!elDragging) return;
+    ev.preventDefault();
+    const cx = (ev.touches ? ev.touches[0].clientX : ev.clientX);
+    const cy = (ev.touches ? ev.touches[0].clientY : ev.clientY);
+    elDragging.style.left = (cx / pvScale - elDragOffX) + 'px';
+    elDragging.style.top = (cy / pvScale - elDragOffY) + 'px';
+  };
+  const up = () => { elDragging = null; };
+  document.addEventListener('mousemove', move);
+  document.addEventListener('mouseup', up, { once: true });
+  document.addEventListener('touchmove', move, { passive: false });
+  document.addEventListener('touchend', up, { once: true });
+}
+
+function startResize(e, el) {
+  e.stopPropagation();
+  elResizing = el;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  elResizeStartX = clientX;
+  elResizeStartY = clientY;
+  elResizeStartW = el.offsetWidth;
+  elResizeStartH = el.offsetHeight;
+
+  const move = ev => {
+    if (!elResizing) return;
+    ev.preventDefault();
+    const cx = ev.touches ? ev.touches[0].clientX : ev.clientX;
+    const cy = ev.touches ? ev.touches[0].clientY : ev.clientY;
+    elResizing.style.width = Math.max(60, elResizeStartW + (cx - elResizeStartX) / pvScale) + 'px';
+    elResizing.style.height = Math.max(30, elResizeStartH + (cy - elResizeStartY) / pvScale) + 'px';
+  };
+  const up = () => { elResizing = null; };
+  document.addEventListener('mousemove', move);
+  document.addEventListener('mouseup', up, { once: true });
+  document.addEventListener('touchmove', move, { passive: false });
+  document.addEventListener('touchend', up, { once: true });
+}
+
+function updatePropertiesForEl(el) {
+  const name = el.id.replace('el-', '');
+  document.getElementById('prop-name').textContent = name;
+}
+
+// ─────────────────────────────────────────────
+// PANEL RESIZING
+// ─────────────────────────────────────────────
+(function() {
+  const handle = document.getElementById('resize-handle');
+  let dragging = false, startX = 0, startW = 0;
+  const panel = document.getElementById('preview-panel');
+
+  const start = e => {
+    dragging = true;
+    startX = e.touches ? e.touches[0].clientX : e.clientX;
+    startW = panel.offsetWidth;
+    e.preventDefault();
+  };
+  const move = e => {
+    if (!dragging) return;
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    panel.style.width = Math.max(180, Math.min(700, startW - (cx - startX))) + 'px';
+  };
+  const end = () => { dragging = false; };
+  handle.addEventListener('mousedown', start);
+  handle.addEventListener('touchstart', start, { passive: false });
+  document.addEventListener('mousemove', move);
+  document.addEventListener('touchmove', move, { passive: false });
+  document.addEventListener('mouseup', end);
+  document.addEventListener('touchend', end);
+})();
+
+// Sidebar resizer
+(function() {
+  const handle = document.getElementById('sidebar-resizer');
+  const sidebar = document.getElementById('sidebar');
+  let dragging = false, startX = 0, startW = 0;
+  const start = e => {
+    dragging = true;
+    startX = e.touches ? e.touches[0].clientX : e.clientX;
+    startW = sidebar.offsetWidth;
+    e.preventDefault();
+  };
+  const move = e => {
+    if (!dragging) return;
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const w = Math.max(160, Math.min(400, startW + (cx - startX)));
+    sidebar.style.width = w + 'px';
+    sidebar.style.minWidth = w + 'px';
+  };
+  const end = () => { dragging = false; };
+  handle.addEventListener('mousedown', start);
+  handle.addEventListener('touchstart', start, { passive: false });
+  document.addEventListener('mousemove', move);
+  document.addEventListener('touchmove', move, { passive: false });
+  document.addEventListener('mouseup', end);
+  document.addEventListener('touchend', end);
+})();
+
+// ─────────────────────────────────────────────
+// BOTTOM PANEL
+// ─────────────────────────────────────────────
+function switchBottomTab(name, btn) {
+  document.querySelectorAll('.btm-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  ['output','errors','snippets','docs'].forEach(n => {
+    document.getElementById('panel-' + n).style.display = n === name ? 'block' : 'none';
+  });
+}
+
+function addLog(type, msg) {
+  const panel = document.getElementById('panel-output');
+  const now = new Date();
+  const t = `${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  const icons = { info: 'fa-circle-info', success: 'fa-check-circle', warn: 'fa-triangle-exclamation', error: 'fa-times-circle' };
+  const colors = { info: 'var(--accent)', success: 'var(--green)', warn: 'var(--yellow)', error: 'var(--red)' };
+  const div = document.createElement('div');
+  div.className = 'log-line';
+  div.innerHTML = `<span class="log-time">${t}</span><span class="log-icon"><i class="fa-solid ${icons[type]}" style="color:${colors[type]}"></i></span><span class="log-${type}">${msg}</span>`;
+  panel.appendChild(div);
+  panel.scrollTop = panel.scrollHeight;
+}
+
+// ─────────────────────────────────────────────
+// ANIMATIONS
+// ─────────────────────────────────────────────
+const ANIM_SNIPPETS = {
+  fade: `-- Fade In animation
+local function fadeIn(element, duration)
+    element.BackgroundTransparency = 1
+    element.Visible = true
+    TweenService:Create(element,
+        TweenInfo.new(duration or 0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        { BackgroundTransparency = 0 }
+    ):Play()
+end`,
+  slide: `-- Slide In from bottom
+local function slideIn(element, duration)
+    local target = element.Position
+    element.Position = UDim2.new(target.X.Scale, target.X.Offset, target.Y.Scale + 0.1, target.Y.Offset)
+    element.Visible = true
+    TweenService:Create(element,
+        TweenInfo.new(duration or 0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+        { Position = target }
+    ):Play()
+end`,
+  bounce: `-- Bounce Scale effect
+local function bounceScale(element)
+    local orig = element.Size
+    TweenService:Create(element, TweenInfo.new(0.12, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+        { Size = UDim2.new(orig.X.Scale*1.12, 0, orig.Y.Scale*1.12, 0) }):Play()
+    task.delay(0.12, function()
+        TweenService:Create(element, TweenInfo.new(0.2, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out),
+            { Size = orig }):Play()
+    end)
+end`,
+  scale: `-- Scale In
+local function scaleIn(element, duration)
+    element.Size = UDim2.new(0,0,0,0)
+    element.Visible = true
+    TweenService:Create(element,
+        TweenInfo.new(duration or 0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+        { Size = UDim2.new(0.4,0,0.35,0) } -- set to original size
+    ):Play()
+end`,
+  shake: `-- Shake effect
+local function shake(element, intensity, duration)
+    intensity = intensity or 5
+    duration = duration or 0.4
+    local origPos = element.Position
+    local elapsed = 0
+    game:GetService("RunService").Heartbeat:Connect(function(dt)
+        elapsed += dt
+        if elapsed >= duration then element.Position = origPos return end
+        local f = 1 - elapsed/duration
+        element.Position = UDim2.new(origPos.X.Scale, origPos.X.Offset + math.random(-intensity,intensity)*f,
+            origPos.Y.Scale, origPos.Y.Offset + math.random(-intensity,intensity)*f)
+    end)
+end`,
+  pulse: `-- Pulse loop animation
+local function pulse(element, scale, speed)
+    scale = scale or 1.06
+    speed = speed or 0.8
+    local orig = element.Size
+    TweenService:Create(element,
+        TweenInfo.new(speed, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
+        { Size = UDim2.new(orig.X.Scale*scale, 0, orig.Y.Scale*scale, 0) }
+    ):Play()
+end`,
+  spring: `-- Spring animation
+local function springIn(element, targetSize)
+    TweenService:Create(element,
+        TweenInfo.new(0.5, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out),
+        { Size = targetSize }
+    ):Play()
+end`,
+  flip: `-- Flip animation (simulated via size)
+local function flip(element)
+    TweenService:Create(element, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+        { Size = UDim2.new(0, 0, element.Size.Y.Scale, 0) }):Play()
+    task.delay(0.15, function()
+        TweenService:Create(element, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            { Size = UDim2.new(0.4, 0, 0.35, 0) }):Play()
+    end)
+end`,
+  typewriter: `-- Typewriter text effect
+local function typewriter(label, text, speed)
+    speed = speed or 0.05
+    label.Text = ""
+    for i = 1, #text do
+        label.Text = string.sub(text, 1, i)
+        task.wait(speed)
+    end
+end`,
+  rainbow: `-- Rainbow color cycle
+local function rainbow(element, speed)
+    local hue = 0
+    game:GetService("RunService").Heartbeat:Connect(function(dt)
+        hue = (hue + dt / (speed or 2)) % 1
+        element.BackgroundColor3 = Color3.fromHSV(hue, 0.8, 1)
+    end)
+end`,
+};
+
+const SNIPPET_LIBRARY = {
+  tween: `local TweenService = game:GetService("TweenService")
+local info = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+local tween = TweenService:Create(element, info, { BackgroundTransparency = 0 })
+tween:Play()`,
+  uicorner: `local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = frame`,
+  uistroke: `local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(91, 141, 239)
+stroke.Thickness = 2
+stroke.Parent = frame`,
+  uilistlayout: `local layout = Instance.new("UIListLayout")
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Padding = UDim.new(0, 8)
+layout.Parent = frame`,
+  remotevent: `local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local event = ReplicatedStorage:WaitForChild("MyEvent")
+event.OnClientEvent:Connect(function(data)
+    print("Received:", data)
+end)`,
+  clickdetect: `button.MouseButton1Click:Connect(function()
+    print("Clicked!")
+end)`,
+  mouseenter: `element.MouseEnter:Connect(function()
+    TweenService:Create(element, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(100,160,255) }):Play()
+end)
+element.MouseLeave:Connect(function()
+    TweenService:Create(element, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(91,141,239) }):Play()
+end)`,
+  touchbutton: `button.TouchTap:Connect(function()
+    print("Tapped!")
+end)`,
+};
+
+function insertAnimation(type) {
+  const snippet = ANIM_SNIPPETS[type];
+  if (!snippet) return;
+  insertAtCursor('\n\n' + snippet + '\n');
+  addLog('success', `Inserted ${type} animation snippet`);
+}
+
+function insertEasing(style) {
+  insertAtCursor(`Enum.EasingStyle.${style}`);
+}
+
+function insertSnippet(type) {
+  const snippet = SNIPPET_LIBRARY[type];
+  if (!snippet) return;
+  insertAtCursor('\n\n' + snippet + '\n');
+  addLog('success', `Inserted ${type} snippet`);
+}
+
+function insertAtCursor(text) {
+  const s = editor.selectionStart;
+  editor.value = editor.value.substr(0, s) + text + editor.value.substr(editor.selectionEnd);
+  editor.selectionStart = editor.selectionEnd = s + text.length;
+  editor.focus();
+  onCodeChange();
+}
+
+// ─────────────────────────────────────────────
+// FORMAT CODE
+// ─────────────────────────────────────────────
+function formatCode() {
+  let code = editor.value;
+  let indent = 0;
+  const lines = code.split('\n');
+  const result = lines.map(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return '';
+    const closers = ['end', 'else', 'elseif', 'until', '}', ')'];
+    const openers = ['function', 'do', 'then', 'repeat', 'else'];
+    const isCloser = closers.some(c => trimmed.startsWith(c));
+    if (isCloser) indent = Math.max(0, indent - 1);
+    const out = '    '.repeat(indent) + trimmed;
+    const isOpener = openers.some(o => trimmed.endsWith(o) || trimmed.startsWith(o + ' ') || trimmed === o);
+    if (isOpener && !trimmed.startsWith('end') && !trimmed.startsWith('else')) indent++;
+    return out;
+  });
+  editor.value = result.join('\n');
+  onCodeChange();
+  addLog('success', 'Code formatted');
+  showToast('Code formatted', 'ok');
+}
+
+// ─────────────────────────────────────────────
+// RUN ANIMATION
+// ─────────────────────────────────────────────
+function runAnimation() {
+  const el = document.getElementById('el-MainFrame');
+  el.style.transition = 'all 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px) scale(0.95)';
+  setTimeout(() => {
+    el.style.opacity = '1';
+    el.style.transform = 'translateY(0) scale(1)';
+    setTimeout(() => { el.style.transition = ''; el.style.transform = ''; }, 500);
+  }, 100);
+  addLog('success', 'Animation preview played');
+}
+
+// ─────────────────────────────────────────────
+// EXPORT TO STUDIO
+// ─────────────────────────────────────────────
+function openExportModal() {
+  const code = generateStudioCommand();
+  document.getElementById('export-code-block').textContent = code;
+  openModal('export-modal');
+}
+
+function generateStudioCommand() {
+  return `-- Paste this into the Roblox Studio Command Bar
+local sg = game:GetService("StarterGui")
+
+-- Create ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ScreenGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = sg
+
+-- Create MainFrame
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0.4, 0, 0.35, 0)
+mainFrame.Position = UDim2.new(0.3, 0, 0.3, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(15, 20, 35)
+mainFrame.BackgroundTransparency = 0.08
+mainFrame.BorderSizePixel = 0
+mainFrame.Visible = true
+mainFrame.Parent = screenGui
+local c1 = Instance.new("UICorner"); c1.CornerRadius = UDim.new(0,12); c1.Parent = mainFrame
+local s1 = Instance.new("UIStroke"); s1.Color = Color3.fromRGB(91,141,239); s1.Thickness = 1.5; s1.Transparency = 0.7; s1.Parent = mainFrame
+
+-- TitleLabel
+local title = Instance.new("TextLabel")
+title.Name = "TitleLabel"
+title.Size = UDim2.new(1,-24,0,28)
+title.Position = UDim2.new(0,16,0,12)
+title.BackgroundTransparency = 1
+title.Text = "Game Menu"
+title.TextColor3 = Color3.fromRGB(232,234,242)
+title.TextSize = 16
+title.Font = Enum.Font.GothamBold
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = mainFrame
+
+-- PlayButton
+local play = Instance.new("TextButton")
+play.Name = "PlayButton"
+play.Size = UDim2.new(1,-24,0,38)
+play.Position = UDim2.new(0,12,0,52)
+play.BackgroundColor3 = Color3.fromRGB(91,141,239)
+play.Text = "PLAY"
+play.TextColor3 = Color3.fromRGB(255,255,255)
+play.TextSize = 14
+play.Font = Enum.Font.GothamBold
+play.Parent = mainFrame
+local pc = Instance.new("UICorner"); pc.CornerRadius = UDim.new(0,8); pc.Parent = play
+
+-- CloseButton
+local close = Instance.new("TextButton")
+close.Name = "CloseButton"
+close.Size = UDim2.new(1,-24,0,38)
+close.Position = UDim2.new(0,12,0,98)
+close.BackgroundColor3 = Color3.fromRGB(37,43,59)
+close.Text = "SETTINGS"
+close.TextColor3 = Color3.fromRGB(184,189,204)
+close.TextSize = 14
+close.Font = Enum.Font.GothamBold
+close.Parent = mainFrame
+local cc = Instance.new("UICorner"); cc.CornerRadius = UDim.new(0,8); cc.Parent = close
+
+-- HealthBar
+local hbFrame = Instance.new("Frame")
+hbFrame.Name = "HealthBar"
+hbFrame.Size = UDim2.new(0.25,0,0,28)
+hbFrame.Position = UDim2.new(0.01,0,0.03,0)
+hbFrame.BackgroundColor3 = Color3.fromRGB(10,20,15)
+hbFrame.BackgroundTransparency = 0.15
+hbFrame.BorderSizePixel = 0
+hbFrame.Parent = screenGui
+local hc = Instance.new("UICorner"); hc.CornerRadius = UDim.new(0,6); hc.Parent = hbFrame
+local hbar = Instance.new("Frame")
+hbar.Size = UDim2.new(0.72,0,1,0)
+hbar.BackgroundColor3 = Color3.fromRGB(77,201,126)
+hbar.BorderSizePixel = 0
+hbar.Parent = hbFrame
+local hbc = Instance.new("UICorner"); hbc.CornerRadius = UDim.new(0,6); hbc.Parent = hbar
+
+print("✅ UI created in StarterGui!")`;
+}
+
+function copyExportCode() {
+  const code = document.getElementById('export-code-block').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    showToast('Command copied!', 'ok');
+    addLog('success', 'Studio command copied to clipboard');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = code; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('Copied!', 'ok');
+  });
+  closeModal('export-modal');
+}
+
+// ─────────────────────────────────────────────
+// IMPORT
+// ─────────────────────────────────────────────
+function openUploadModal() { openModal('upload-modal'); }
+function triggerFileInput() { document.getElementById('file-input').click(); }
+function onDragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag-over'); }
+function onDragLeave(e) { document.getElementById('upload-zone').classList.remove('drag-over'); }
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) processImportFile(file);
+}
+function onFileSelected(e) {
+  const file = e.target.files[0];
+  if (file) processImportFile(file);
+}
+function processImportFile(file) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      importFromJSON(data);
+    } catch {
+      addLog('warn', 'Could not parse file as JSON — treating as raw script');
+      SCRIPTS[file.name] = ev.target.result;
+      addWorkspaceItem(file.name, 'Script');
+    }
+  };
+  reader.readAsText(file);
+}
+function importUI() {
+  const raw = document.getElementById('paste-json').value.trim();
+  if (raw) {
+    try {
+      const data = JSON.parse(raw);
+      importFromJSON(data);
+    } catch { addLog('error', 'Invalid JSON'); }
+  }
+  closeModal('upload-modal');
+}
+function importFromJSON(data) {
+  const name = data.name || 'ImportedUI';
+  addLog('success', `Imported: ${name}`);
+  addWorkspaceItem(name, 'Frame');
+  showToast(`Imported ${name}`, 'ok');
+  closeModal('upload-modal');
+}
+
+// ─────────────────────────────────────────────
+// MODALS
+// ─────────────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-backdrop').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
+});
+
+// ─────────────────────────────────────────────
+// CONTEXT MENU
+// ─────────────────────────────────────────────
+const ctxMenu = document.getElementById('ctx-menu');
+document.getElementById('workspace-tree').addEventListener('contextmenu', e => {
+  e.preventDefault();
+  ctxMenu.style.left = e.clientX + 'px';
+  ctxMenu.style.top = e.clientY + 'px';
+  ctxMenu.classList.add('open');
+});
+document.addEventListener('click', () => ctxMenu.classList.remove('open'));
+function ctxAction(action) {
+  ctxMenu.classList.remove('open');
+  addLog('info', `Action: ${action}`);
+}
+
+// ─────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type = 'ok') {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  toast.className = type;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ─────────────────────────────────────────────
+// PREVIEW TOGGLE (fullscreen button)
+// ─────────────────────────────────────────────
+let pvFullscreen = false;
+function togglePreviewMode() {
+  const panel = document.getElementById('preview-panel');
+  pvFullscreen = !pvFullscreen;
+  if (pvFullscreen) {
+    panel.style.cssText = 'position:fixed;inset:0;width:100%;z-index:80;';
+    document.getElementById('preview-fs-btn').innerHTML = '<i class="fa-solid fa-compress"></i>';
+  } else {
+    panel.style.cssText = '';
+    document.getElementById('preview-fs-btn').innerHTML = '<i class="fa-solid fa-expand"></i>';
+  }
+}
+
+// ─────────────────────────────────────────────
+// MOBILE
+// ─────────────────────────────────────────────
+function toggleMobileSidebar() {
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+}
+function toggleMobilePreview() {
+  document.getElementById('preview-panel').classList.toggle('mobile-show');
+}
+
+function checkMobile() {
+  const isMobile = window.innerWidth <= 600;
+  document.getElementById('mobile-sidebar-btn').style.display = isMobile ? '' : 'none';
+  document.getElementById('mobile-preview-btn').style.display = isMobile ? '' : 'none';
+}
+window.addEventListener('resize', checkMobile);
+
+// ─────────────────────────────────────────────
+// PROPS
+// ─────────────────────────────────────────────
+function updatePropName(input) {
+  addLog('info', `Property updated: Name → ${input.value}`);
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+initEditor();
+checkMobile();
+applyTransform();
+
+// Keyboard shortcut: Ctrl+F global
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'f' && document.activeElement !== editor) {
+    e.preventDefault(); toggleSearch();
+  }
+  if (e.key === 'Escape') { ctxMenu.classList.remove('open'); }
+});
+
+addLog('info', 'Workspace loaded — 3 scripts, 2 UI elements');
+  </script>
 </body>
+
 </html>
