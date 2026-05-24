@@ -382,6 +382,49 @@
       color: var(--text2);
     }
 
+    .tree-item[draggable="true"] {
+      cursor: grab;
+    }
+
+    .tree-item.tree-dragging {
+      opacity: 0.38;
+      cursor: grabbing;
+    }
+
+    .tree-item.tree-drag-over-above {
+      box-shadow: 0 -2px 0 0 var(--accent);
+    }
+
+    .tree-item.tree-drag-over-below {
+      box-shadow: 0 2px 0 0 var(--accent);
+    }
+
+    .tree-item.tree-drag-over-into {
+      background: var(--accent-glow);
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+    }
+
+    .tree-drag-ghost {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      background: var(--bg3);
+      border: 1px solid var(--accent);
+      border-radius: 5px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+      opacity: 0.95;
+      white-space: nowrap;
+      transform: rotate(1.5deg);
+    }
+
     .tree-indent {
       padding-left: 20px;
     }
@@ -2609,8 +2652,11 @@
         <div class="settings-row">iPad
           Mode<button class="settings-toggle" id="set-ipad" onclick="this.classList.toggle('on');applyIPadMode()"></button>
         </div>
-        <div class="settings-row">Tilt Physics
-          <button class="settings-toggle" id="set-tilt" onclick="this.classList.toggle('on');applyTiltSetting()" title="Elements tilt and wobble while dragging"></button>
+        <div class="settings-row">Preview Tilt Physics
+          <button class="settings-toggle" id="set-tilt" onclick="this.classList.toggle('on');applyTiltSetting()" title="Preview canvas elements tilt while dragging"></button>
+        </div>
+        <div class="settings-row">Tree Tilt Physics
+          <button class="settings-toggle" id="set-tree-tilt" onclick="this.classList.toggle('on');applyTreeTiltSetting()" title="Explorer tree items tilt while being dragged"></button>
         </div>
       </div>
       <div class="modal-btns">
@@ -4085,8 +4131,8 @@ function addWorkspaceItemAt(name, type, afterEl) {
   const ico = typeIcons[type] || 'fa-solid fa-square';
   div.innerHTML = `<span class="ti-icon"><i class="${ico}" style="color:${col}"></i></span><span class="ti-label">${name}</span><span class="ti-badge">${type}</span>`;
   div.onclick = () => selectItem(div, name);
+  initTreeItemDrag(div);
   if (afterEl) {
-    // Insert as a child (indented) after the selected element
     const indentDiv = document.createElement('div');
     indentDiv.className = 'tree-indent';
     indentDiv.appendChild(div);
@@ -4095,6 +4141,177 @@ function addWorkspaceItemAt(name, type, afterEl) {
     tree.appendChild(div);
   }
   return div;
+}
+
+// ─────────────────────────────────────────────
+// TREE ITEM DRAG & DROP
+// ─────────────────────────────────────────────
+let treeTiltEnabled = false;
+function applyTreeTiltSetting() {
+  treeTiltEnabled = document.getElementById('set-tree-tilt').classList.contains('on');
+  showToast('Tree Tilt Physics ' + (treeTiltEnabled ? 'ON' : 'OFF'), 'ok');
+}
+
+let treeDragSrc = null;
+let treeDragGhost = null;
+let treeDragRafId = null;
+let treeDragLastX = 0, treeDragLastY = 0;
+let treeDragVelX = 0, treeDragVelY = 0;
+let treeDragTiltEl = null;
+
+function initTreeItemDrag(el) {
+  el.setAttribute('draggable', 'true');
+
+  // ── DRAG START ──
+  el.addEventListener('dragstart', e => {
+    treeDragSrc = el;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', el.getAttribute('data-name') || '');
+
+    // Hide default browser ghost immediately
+    const blank = document.createElement('canvas');
+    blank.width = 1; blank.height = 1;
+    e.dataTransfer.setDragImage(blank, 0, 0);
+
+    setTimeout(() => el.classList.add('tree-dragging'), 0);
+
+    // Build custom ghost
+    const label = el.querySelector('.ti-label')?.textContent || 'item';
+    const icon  = el.querySelector('.ti-icon')?.innerHTML || '';
+    treeDragGhost = document.createElement('div');
+    treeDragGhost.className = 'tree-drag-ghost';
+    treeDragGhost.innerHTML = icon + label;
+    treeDragGhost.style.left = e.clientX + 14 + 'px';
+    treeDragGhost.style.top  = e.clientY - 10 + 'px';
+    document.body.appendChild(treeDragGhost);
+
+    treeDragLastX = e.clientX;
+    treeDragLastY = e.clientY;
+    treeDragTiltEl = el;
+  });
+
+  // ── DRAG END ──
+  el.addEventListener('dragend', () => {
+    el.classList.remove('tree-dragging');
+    if (treeDragGhost) { treeDragGhost.remove(); treeDragGhost = null; }
+    if (treeDragRafId) { cancelAnimationFrame(treeDragRafId); treeDragRafId = null; }
+    // Spring tilt back
+    if (treeTiltEnabled && treeDragTiltEl) {
+      treeDragTiltEl.style.transition = 'transform 0.45s cubic-bezier(0.34,1.56,0.64,1)';
+      treeDragTiltEl.style.transform = 'rotate(0deg) scale(1)';
+      setTimeout(() => { if (treeDragTiltEl) { treeDragTiltEl.style.transition = ''; treeDragTiltEl.style.transform = ''; treeDragTiltEl = null; } }, 480);
+    }
+    document.querySelectorAll('.tree-item').forEach(t => {
+      t.classList.remove('tree-drag-over-above','tree-drag-over-below','tree-drag-over-into');
+    });
+    treeDragSrc = null;
+  });
+
+  // ── DRAG OVER (self as target) ──
+  el.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (!treeDragSrc || treeDragSrc === el) return;
+
+    // Clear all indicators
+    document.querySelectorAll('.tree-item').forEach(t => {
+      t.classList.remove('tree-drag-over-above','tree-drag-over-below','tree-drag-over-into');
+    });
+
+    const rect = el.getBoundingClientRect();
+    const relY = e.clientY - rect.top;
+    const zone = rect.height / 3;
+    if (relY < zone) {
+      el.classList.add('tree-drag-over-above');
+    } else if (relY > zone * 2) {
+      el.classList.add('tree-drag-over-below');
+    } else {
+      el.classList.add('tree-drag-over-into');
+    }
+  });
+
+  el.addEventListener('dragleave', () => {
+    el.classList.remove('tree-drag-over-above','tree-drag-over-below','tree-drag-over-into');
+  });
+
+  // ── DROP ──
+  el.addEventListener('drop', e => {
+    e.preventDefault();
+    if (!treeDragSrc || treeDragSrc === el) return;
+
+    document.querySelectorAll('.tree-item').forEach(t => {
+      t.classList.remove('tree-drag-over-above','tree-drag-over-below','tree-drag-over-into');
+    });
+
+    const rect = el.getBoundingClientRect();
+    const relY = e.clientY - rect.top;
+    const zone = rect.height / 3;
+
+    // Find what container (indent div or tree root) src lives in
+    const srcContainer = treeDragSrc.parentElement;
+
+    if (relY < zone / 1.5) {
+      // DROP ABOVE — insert src before target (same level)
+      const targetContainer = el.parentElement;
+      // Move src's wrapper or src itself
+      const srcWrap = srcContainer?.classList.contains('tree-indent') ? srcContainer : treeDragSrc;
+      targetContainer.insertBefore(srcWrap, el.classList.contains('tree-indent') ? el.parentElement : el);
+    } else if (relY > zone * 2) {
+      // DROP BELOW — insert src after target
+      const targetContainer = el.parentElement;
+      const srcWrap = srcContainer?.classList.contains('tree-indent') ? srcContainer : treeDragSrc;
+      const ref = el.nextSibling;
+      if (ref) targetContainer.insertBefore(srcWrap, ref);
+      else targetContainer.appendChild(srcWrap);
+    } else {
+      // DROP INTO — nest src inside target as indented child
+      let indent = el.nextSibling;
+      if (!indent || !indent.classList?.contains('tree-indent')) {
+        indent = document.createElement('div');
+        indent.className = 'tree-indent';
+        el.insertAdjacentElement('afterend', indent);
+      }
+      // Unwrap src from its indent if needed
+      if (srcContainer?.classList.contains('tree-indent') && srcContainer.children.length === 1) {
+        srcContainer.replaceWith(treeDragSrc);
+      }
+      indent.appendChild(treeDragSrc);
+    }
+
+    const srcName = treeDragSrc.getAttribute('data-name') || 'item';
+    const tgtName = el.getAttribute('data-name') || 'item';
+    showToast(`Moved ${srcName}`, 'ok');
+    addLog('info', `Tree: moved "${srcName}" → "${tgtName}"`);
+  });
+}
+
+// Global dragover — move ghost + tilt
+document.addEventListener('dragover', e => {
+  if (!treeDragGhost) return;
+
+  const dx = e.clientX - treeDragLastX;
+  const dy = e.clientY - treeDragLastY;
+  treeDragVelX = dx;
+  treeDragVelY = dy;
+  treeDragLastX = e.clientX;
+  treeDragLastY = e.clientY;
+
+  if (treeDragRafId) cancelAnimationFrame(treeDragRafId);
+  treeDragRafId = requestAnimationFrame(() => {
+    if (treeDragGhost) {
+      treeDragGhost.style.left = e.clientX + 14 + 'px';
+      treeDragGhost.style.top  = e.clientY - 10 + 'px';
+    }
+    if (treeTiltEnabled && treeDragTiltEl) {
+      const tilt = Math.max(-12, Math.min(12, treeDragVelX * 1.8));
+      treeDragTiltEl.style.transform = `rotate(${tilt}deg) scale(1.04)`;
+    }
+  });
+});
+
+// Init drag on all existing tree items at startup
+function initAllTreeDrag() {
+  document.querySelectorAll('#workspace-tree .tree-item').forEach(initTreeItemDrag);
 }
 
 // Add Child Modal
@@ -4334,9 +4551,10 @@ viewport.addEventListener('touchmove', e => {
   }
 }, { passive: false });
 
-// Pan
+// Pan — only pan when clicking background, not UI elements
 viewport.addEventListener('mousedown', e => {
-  if (e.target === viewport || e.target === document.getElementById('preview-bg') || e.target === canvas) {
+  const isEl = e.target.closest('.preview-ui-el');
+  if (!isEl && (e.target === viewport || e.target === document.getElementById('preview-bg') || e.target === canvas || e.target.id === 'preview-canvas')) {
     pvDragging = true; pvDragStartX = e.clientX - pvX; pvDragStartY = e.clientY - pvY;
     viewport.classList.add('grabbing');
   }
@@ -4357,91 +4575,95 @@ viewport.addEventListener('wheel', e => {
 let tiltPhysicsEnabled = false;
 function applyTiltSetting() {
   tiltPhysicsEnabled = document.getElementById('set-tilt').classList.contains('on');
-  document.querySelectorAll('.preview-ui-el').forEach(el => {
-    el.classList.toggle('tilt-physics', tiltPhysicsEnabled);
-  });
   showToast('Tilt Physics ' + (tiltPhysicsEnabled ? 'ON' : 'OFF'), 'ok');
 }
 
 // ─────────────────────────────────────────────
 // ELEMENT DRAG & RESIZE
 // ─────────────────────────────────────────────
+function getEventXY(e) {
+  return e.touches
+    ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+    : { x: e.clientX, y: e.clientY };
+}
+
+function clientToCanvas(cx, cy) {
+  // viewport offset + canvas pan + scale
+  const vr = viewport.getBoundingClientRect();
+  return {
+    x: (cx - vr.left - pvX) / pvScale,
+    y: (cy - vr.top  - pvY) / pvScale
+  };
+}
+
 function startDrag(e, el) {
   if (e.target.classList.contains('resize-handle')) return;
   e.stopPropagation();
+  e.preventDefault();
 
-  // Select
+  // Select element
   if (selectedEl) selectedEl.classList.remove('selected');
   selectedEl = el;
   el.classList.add('selected');
   updatePropertiesForEl(el);
 
-  const getClient = ev => ({
-    x: ev.touches ? ev.touches[0].clientX : ev.clientX,
-    y: ev.touches ? ev.touches[0].clientY : ev.clientY
-  });
+  const { x: startCX, y: startCY } = getEventXY(e);
+  const startCanvas = clientToCanvas(startCX, startCY);
 
-  const start = getClient(e);
-  const canvasRect = canvas.getBoundingClientRect();
+  // Store offset from element origin so it doesn't jump
+  const offX = startCanvas.x - el.offsetLeft;
+  const offY = startCanvas.y - el.offsetTop;
 
-  // Offset from element top-left in canvas space
-  elDragOffX = (start.x - canvasRect.left) / pvScale - el.offsetLeft;
-  elDragOffY = (start.y - canvasRect.top) / pvScale - el.offsetTop;
   elDragging = el;
 
-  // Physics state
-  let lastX = start.x, lastY = start.y;
+  let lastCX = startCX, lastCY = startCY;
   let velX = 0, velY = 0;
-  let tiltX = 0, tiltY = 0;
   let rafId = null;
+  let moved = false;
 
-  if (tiltPhysicsEnabled) {
-    el.classList.add('tilt-dragging');
-  }
+  if (tiltPhysicsEnabled) el.classList.add('tilt-dragging');
+  el.style.zIndex = '50';
 
   const move = ev => {
-    if (!elDragging) return;
     ev.preventDefault();
-    const { x: cx, y: cy } = getClient(ev);
-    const cr = canvas.getBoundingClientRect();
+    const { x: cx, y: cy } = getEventXY(ev);
+    velX = cx - lastCX;
+    velY = cy - lastCY;
+    lastCX = cx; lastCY = cy;
+    moved = true;
 
-    // Velocity for tilt
-    velX = cx - lastX;
-    velY = cy - lastY;
-    lastX = cx;
-    lastY = cy;
-
-    // Smooth position using rAF
-    const newLeft = (cx - cr.left) / pvScale - elDragOffX;
-    const newTop = (cy - cr.top) / pvScale - elDragOffY;
+    const pos = clientToCanvas(cx, cy);
+    const newLeft = pos.x - offX;
+    const newTop  = pos.y - offY;
 
     if (rafId) cancelAnimationFrame(rafId);
     rafId = requestAnimationFrame(() => {
-      elDragging.style.left = newLeft + 'px';
-      elDragging.style.top = newTop + 'px';
+      if (!elDragging) return;
+      el.style.left = newLeft + 'px';
+      el.style.top  = newTop  + 'px';
 
       if (tiltPhysicsEnabled) {
-        // Tilt based on velocity — clamp to ±18deg
-        tiltX = Math.max(-18, Math.min(18, velY * 1.1));
-        tiltY = Math.max(-18, Math.min(18, -velX * 1.1));
-        elDragging.style.transform = `rotate3d(1,0,0,${tiltX}deg) rotate3d(0,1,0,${tiltY}deg) scale(1.04)`;
+        const tx = Math.max(-16, Math.min(16, velY * 1.2));
+        const ty = Math.max(-16, Math.min(16, -velX * 1.2));
+        el.style.transform = `perspective(600px) rotateX(${tx}deg) rotateY(${ty}deg) scale(1.04)`;
       }
     });
   };
 
   const up = () => {
     elDragging = null;
+    el.style.zIndex = '';
     if (rafId) cancelAnimationFrame(rafId);
 
-    if (tiltPhysicsEnabled && el) {
+    if (tiltPhysicsEnabled) {
       el.classList.remove('tilt-dragging');
-      // Spring back to flat with a bounce
-      el.style.transition = 'transform 0.45s cubic-bezier(0.34,1.56,0.64,1)';
-      el.style.transform = 'rotate3d(1,0,0,0deg) rotate3d(0,1,0,0deg) scale(1)';
-      setTimeout(() => {
-        if (el) { el.style.transition = ''; el.style.transform = ''; }
-      }, 500);
+      el.style.transition = 'transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+      el.style.transform = 'perspective(600px) rotateX(0deg) rotateY(0deg) scale(1)';
+      setTimeout(() => { el.style.transition = ''; el.style.transform = ''; }, 520);
     }
+
+    document.removeEventListener('mousemove', move);
+    document.removeEventListener('touchmove', move);
   };
 
   document.addEventListener('mousemove', move, { passive: false });
@@ -4452,24 +4674,31 @@ function startDrag(e, el) {
 
 function startResize(e, el) {
   e.stopPropagation();
+  e.preventDefault();
   elResizing = el;
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  elResizeStartX = clientX;
-  elResizeStartY = clientY;
+  const { x: startX, y: startY } = getEventXY(e);
+  elResizeStartX = startX;
+  elResizeStartY = startY;
   elResizeStartW = el.offsetWidth;
   elResizeStartH = el.offsetHeight;
+  el.style.zIndex = '50';
 
   const move = ev => {
     if (!elResizing) return;
     ev.preventDefault();
-    const cx = ev.touches ? ev.touches[0].clientX : ev.clientX;
-    const cy = ev.touches ? ev.touches[0].clientY : ev.clientY;
-    elResizing.style.width = Math.max(60, elResizeStartW + (cx - elResizeStartX) / pvScale) + 'px';
-    elResizing.style.height = Math.max(30, elResizeStartH + (cy - elResizeStartY) / pvScale) + 'px';
+    const { x: cx, y: cy } = getEventXY(ev);
+    const dw = (cx - elResizeStartX) / pvScale;
+    const dh = (cy - elResizeStartY) / pvScale;
+    elResizing.style.width  = Math.max(60, elResizeStartW + dw) + 'px';
+    elResizing.style.height = Math.max(30, elResizeStartH + dh) + 'px';
   };
-  const up = () => { elResizing = null; };
-  document.addEventListener('mousemove', move);
+  const up = () => {
+    elResizing = null;
+    el.style.zIndex = '';
+    document.removeEventListener('mousemove', move);
+    document.removeEventListener('touchmove', move);
+  };
+  document.addEventListener('mousemove', move, { passive: false });
   document.addEventListener('mouseup', up, { once: true });
   document.addEventListener('touchmove', move, { passive: false });
   document.addEventListener('touchend', up, { once: true });
@@ -5283,6 +5512,7 @@ function updatePropName(input) {
 initEditor();
 checkMobile();
 applyTransform();
+initAllTreeDrag();
 
 // Keyboard shortcut: Ctrl+F global
 document.addEventListener('keydown', e => {
