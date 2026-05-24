@@ -403,10 +403,6 @@
       letter-spacing: 1.2px;
     }
 
-    .tree-group-header i {
-      font-size: 9px;
-    }
-
     /* ── MAIN AREA ── */
     #main {
       flex: 1;
@@ -870,6 +866,17 @@
       cursor: move;
       border: 2px solid transparent;
       transition: border-color 0.1s;
+      transform-origin: center center;
+      will-change: transform, left, top;
+    }
+
+    .preview-ui-el.tilt-physics {
+      transition: border-color 0.1s, box-shadow 0.15s;
+    }
+
+    .preview-ui-el.tilt-dragging {
+      filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.55));
+      z-index: 50 !important;
     }
 
     .preview-ui-el:hover {
@@ -2602,6 +2609,9 @@
         <div class="settings-row">iPad
           Mode<button class="settings-toggle" id="set-ipad" onclick="this.classList.toggle('on');applyIPadMode()"></button>
         </div>
+        <div class="settings-row">Tilt Physics
+          <button class="settings-toggle" id="set-tilt" onclick="this.classList.toggle('on');applyTiltSetting()" title="Elements tilt and wobble while dragging"></button>
+        </div>
       </div>
       <div class="modal-btns">
         <button class="modal-btn" onclick="closeModal('settings-modal')">Close</button>
@@ -2632,7 +2642,9 @@
           </div>
         </div>
         <div class="sidebar-content" id="workspace-tree">
-          <div class="tree-group-header"><i class="fa-solid fa-chevron-down"></i> StarterGui</div>
+          <div class="tree-group-header" data-category="StarterGui"><i class="fa-solid fa-chevron-down"></i>
+            <span class="tgh-label">StarterGui</span><button class="tgh-add-btn" onclick="tghAdd('StarterGui',event)" title="Add element"><i class="fa-solid fa-plus"></i></button>
+          </div>
           <div class="tree-item active" onclick="selectItem(this,'ScreenGui')" data-name="ScreenGui">
             <span class="ti-icon"><i class="fa-solid fa-display" style="color:#5b8def"></i></span>
             <span class="ti-label">ScreenGui</span>
@@ -2668,7 +2680,10 @@
             </div>
           </div>
 
-          <div class="tree-group-header" style="margin-top:8px"><i class="fa-solid fa-chevron-down"></i> Scripts</div>
+          <div class="tree-group-header" style="margin-top:8px" data-category="Scripts">
+            <i class="fa-solid fa-chevron-down"></i>
+            <span class="tgh-label">Scripts</span><button class="tgh-add-btn" onclick="tghAdd('Scripts',event)" title="Add script"><i class="fa-solid fa-plus"></i></button>
+          </div>
           <div class="tree-item" onclick="selectItem(this,'AnimationController')" data-name="AnimationController">
             <span class="ti-icon"><i class="fa-solid fa-scroll" style="color:#f0c94d"></i></span>
             <span class="ti-label">AnimationController</span>
@@ -2685,7 +2700,10 @@
             <span class="ti-badge">Module</span>
           </div>
 
-          <div class="tree-group-header" style="margin-top:8px"><i class="fa-solid fa-chevron-down"></i> Assets</div>
+          <div class="tree-group-header" style="margin-top:8px" data-category="Assets">
+            <i class="fa-solid fa-chevron-down"></i>
+            <span class="tgh-label">Assets</span><button class="tgh-add-btn" onclick="tghAdd('Assets',event)" title="Add asset"><i class="fa-solid fa-plus"></i></button>
+          </div>
           <div class="tree-item" onclick="selectItem(this,'Images')" data-name="Images">
             <span class="ti-icon"><i class="fa-solid fa-images" style="color:#a97ef5"></i></span>
             <span class="ti-label">Images</span>
@@ -3978,6 +3996,84 @@ function addWorkspaceItem(name, type) {
   return addWorkspaceItemAt(name, type, null);
 }
 
+// ─────────────────────────────────────────────
+// TREE GROUP HEADER + BUTTON
+// ─────────────────────────────────────────────
+function tghAdd(category, e) {
+  e.stopPropagation();
+  // Pick types relevant to each category
+  const categoryTypes = {
+    StarterGui: ['Frame','TextLabel','TextButton','ImageLabel','ScrollingFrame','ImageButton','TextBox','ViewportFrame','UICorner','UIStroke','UIGradient','UIListLayout','UIGridLayout','UIPadding','UIScale'],
+    Scripts: ['LocalScript','ModuleScript','Script','RemoteEvent'],
+    Assets: ['Folder','ImageLabel','Sound']
+  };
+  const types = categoryTypes[category] || ['Frame'];
+
+  // Remove any existing quick-add popup
+  const existing = document.getElementById('tgh-popup');
+  if (existing) { existing.remove(); return; }
+
+  const popup = document.createElement('div');
+  popup.id = 'tgh-popup';
+  popup.style.cssText = `position:fixed;z-index:700;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:8px;box-shadow:0 8px 32px rgba(0,0,0,0.55);min-width:220px;backdrop-filter:blur(12px);animation:modal-in 0.15s ease`;
+
+  // Position near the button
+  const btn = e.target.closest('.tgh-add-btn');
+  const rect = btn.getBoundingClientRect();
+  popup.style.left = Math.min(rect.right + 8, window.innerWidth - 240) + 'px';
+  popup.style.top = Math.max(rect.top - 4, 8) + 'px';
+
+  popup.innerHTML = `
+    <div style="font-size:9px;font-weight:600;font-family:'DM Mono',monospace;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;padding:0 4px">Add to ${category}</div>
+    <input id="tgh-search" placeholder="Search type..." style="width:100%;height:26px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text0);font-size:11px;font-family:'JetBrains Mono',monospace;padding:0 8px;outline:none;margin-bottom:6px" oninput="tghFilter(this.value)">
+    <div id="tgh-type-list" style="display:flex;flex-wrap:wrap;gap:4px;max-height:160px;overflow-y:auto">
+      ${types.map(t => `<span class="tgh-chip" data-type="${t}" onclick="tghConfirm('${t}','${category}')" style="display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:5px;background:var(--bg4);border:1px solid var(--border);font-size:11px;color:var(--text1);cursor:pointer;transition:all .12s">${t}</span>`).join('')}
+    </div>
+    <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:6px;display:flex;gap:6px">
+      <input id="tgh-custom-name" placeholder="Custom name..." style="flex:1;height:26px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text0);font-size:11px;font-family:'JetBrains Mono',monospace;padding:0 8px;outline:none">
+      <button onclick="tghConfirmCustom('${category}')" style="height:26px;padding:0 10px;background:var(--accent);border:none;border-radius:5px;color:#fff;font-size:11px;font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer"><i class="fa-solid fa-plus"></i></button>
+    </div>`;
+
+  // Hover effect
+  popup.addEventListener('mouseover', e => { const c = e.target.closest('.tgh-chip'); if (c) { c.style.background='var(--accent-glow)'; c.style.borderColor='var(--accent)'; c.style.color='var(--accent)'; }});
+  popup.addEventListener('mouseout', e => { const c = e.target.closest('.tgh-chip'); if (c) { c.style.background='var(--bg4)'; c.style.borderColor='var(--border)'; c.style.color='var(--text1)'; }});
+
+  document.body.appendChild(popup);
+  setTimeout(() => popup.querySelector('#tgh-search').focus(), 50);
+
+  // Close on outside click
+  const close = ev => { if (!popup.contains(ev.target) && !ev.target.closest('.tgh-add-btn')) { popup.remove(); document.removeEventListener('mousedown', close); document.removeEventListener('touchstart', close); }};
+  setTimeout(() => { document.addEventListener('mousedown', close); document.addEventListener('touchstart', close); }, 100);
+}
+
+function tghFilter(q) {
+  document.querySelectorAll('#tgh-type-list .tgh-chip').forEach(chip => {
+    chip.style.display = !q || chip.dataset.type.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+
+function tghConfirm(type, category) {
+  const name = type + '_' + Math.floor(Math.random() * 100 + 1);
+  addWorkspaceItem(name, type);
+  if (['LocalScript','ModuleScript','Script'].includes(type)) {
+    SCRIPTS[name] = `-- ${name} (${type})\n\n`;
+    newFileTab(name, type);
+  }
+  showToast(`Added ${type}: ${name}`, 'ok');
+  addLog('success', `Added ${type} → ${category}: ${name}`);
+  document.getElementById('tgh-popup')?.remove();
+}
+
+function tghConfirmCustom(category) {
+  const nameEl = document.getElementById('tgh-custom-name');
+  const name = nameEl?.value.trim();
+  if (!name) { showToast('Enter a name', 'warn'); return; }
+  addWorkspaceItem(name, 'Frame');
+  showToast(`Added: ${name}`, 'ok');
+  addLog('success', `Custom element added → ${category}: ${name}`);
+  document.getElementById('tgh-popup')?.remove();
+}
+
 function addWorkspaceItemAt(name, type, afterEl) {
   const tree = document.getElementById('workspace-tree');
   const div = document.createElement('div');
@@ -4256,6 +4352,18 @@ viewport.addEventListener('wheel', e => {
 }, { passive: false });
 
 // ─────────────────────────────────────────────
+// TILT PHYSICS SETTING
+// ─────────────────────────────────────────────
+let tiltPhysicsEnabled = false;
+function applyTiltSetting() {
+  tiltPhysicsEnabled = document.getElementById('set-tilt').classList.contains('on');
+  document.querySelectorAll('.preview-ui-el').forEach(el => {
+    el.classList.toggle('tilt-physics', tiltPhysicsEnabled);
+  });
+  showToast('Tilt Physics ' + (tiltPhysicsEnabled ? 'ON' : 'OFF'), 'ok');
+}
+
+// ─────────────────────────────────────────────
 // ELEMENT DRAG & RESIZE
 // ─────────────────────────────────────────────
 function startDrag(e, el) {
@@ -4268,22 +4376,75 @@ function startDrag(e, el) {
   el.classList.add('selected');
   updatePropertiesForEl(el);
 
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  elDragOffX = clientX / pvScale - el.offsetLeft;
-  elDragOffY = clientY / pvScale - el.offsetTop;
+  const getClient = ev => ({
+    x: ev.touches ? ev.touches[0].clientX : ev.clientX,
+    y: ev.touches ? ev.touches[0].clientY : ev.clientY
+  });
+
+  const start = getClient(e);
+  const canvasRect = canvas.getBoundingClientRect();
+
+  // Offset from element top-left in canvas space
+  elDragOffX = (start.x - canvasRect.left) / pvScale - el.offsetLeft;
+  elDragOffY = (start.y - canvasRect.top) / pvScale - el.offsetTop;
   elDragging = el;
+
+  // Physics state
+  let lastX = start.x, lastY = start.y;
+  let velX = 0, velY = 0;
+  let tiltX = 0, tiltY = 0;
+  let rafId = null;
+
+  if (tiltPhysicsEnabled) {
+    el.classList.add('tilt-dragging');
+  }
 
   const move = ev => {
     if (!elDragging) return;
     ev.preventDefault();
-    const cx = (ev.touches ? ev.touches[0].clientX : ev.clientX);
-    const cy = (ev.touches ? ev.touches[0].clientY : ev.clientY);
-    elDragging.style.left = (cx / pvScale - elDragOffX) + 'px';
-    elDragging.style.top = (cy / pvScale - elDragOffY) + 'px';
+    const { x: cx, y: cy } = getClient(ev);
+    const cr = canvas.getBoundingClientRect();
+
+    // Velocity for tilt
+    velX = cx - lastX;
+    velY = cy - lastY;
+    lastX = cx;
+    lastY = cy;
+
+    // Smooth position using rAF
+    const newLeft = (cx - cr.left) / pvScale - elDragOffX;
+    const newTop = (cy - cr.top) / pvScale - elDragOffY;
+
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(() => {
+      elDragging.style.left = newLeft + 'px';
+      elDragging.style.top = newTop + 'px';
+
+      if (tiltPhysicsEnabled) {
+        // Tilt based on velocity — clamp to ±18deg
+        tiltX = Math.max(-18, Math.min(18, velY * 1.1));
+        tiltY = Math.max(-18, Math.min(18, -velX * 1.1));
+        elDragging.style.transform = `rotate3d(1,0,0,${tiltX}deg) rotate3d(0,1,0,${tiltY}deg) scale(1.04)`;
+      }
+    });
   };
-  const up = () => { elDragging = null; };
-  document.addEventListener('mousemove', move);
+
+  const up = () => {
+    elDragging = null;
+    if (rafId) cancelAnimationFrame(rafId);
+
+    if (tiltPhysicsEnabled && el) {
+      el.classList.remove('tilt-dragging');
+      // Spring back to flat with a bounce
+      el.style.transition = 'transform 0.45s cubic-bezier(0.34,1.56,0.64,1)';
+      el.style.transform = 'rotate3d(1,0,0,0deg) rotate3d(0,1,0,0deg) scale(1)';
+      setTimeout(() => {
+        if (el) { el.style.transition = ''; el.style.transform = ''; }
+      }, 500);
+    }
+  };
+
+  document.addEventListener('mousemove', move, { passive: false });
   document.addEventListener('mouseup', up, { once: true });
   document.addEventListener('touchmove', move, { passive: false });
   document.addEventListener('touchend', up, { once: true });
