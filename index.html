@@ -4243,39 +4243,38 @@ function initTreeItemDrag(el) {
       t.classList.remove('tree-drag-over-above','tree-drag-over-below','tree-drag-over-into');
     });
 
+    // Guard: don't drop onto own descendant
+    if (treeIsDescendantOf(el, treeDragSrc)) return;
+
     const rect = el.getBoundingClientRect();
     const relY = e.clientY - rect.top;
     const zone = rect.height / 3;
 
-    // Find what container (indent div or tree root) src lives in
-    const srcContainer = treeDragSrc.parentElement;
+    // Collect the src item + its immediate child indent block (contains all children)
+    // as a DocumentFragment so the whole subtree moves atomically
+    const srcBundle = treeGetBundle(treeDragSrc);
 
-    if (relY < zone / 1.5) {
-      // DROP ABOVE — insert src before target (same level)
-      const targetContainer = el.parentElement;
-      // Move src's wrapper or src itself
-      const srcWrap = srcContainer?.classList.contains('tree-indent') ? srcContainer : treeDragSrc;
-      targetContainer.insertBefore(srcWrap, el.classList.contains('tree-indent') ? el.parentElement : el);
+    if (relY < zone) {
+      // ── ABOVE: insert bundle before the target row (at same indent level) ──
+      const anchor = treeGetBundle(el);  // target + its children block
+      el.parentElement.insertBefore(srcBundle, anchor);
     } else if (relY > zone * 2) {
-      // DROP BELOW — insert src after target
-      const targetContainer = el.parentElement;
-      const srcWrap = srcContainer?.classList.contains('tree-indent') ? srcContainer : treeDragSrc;
-      const ref = el.nextSibling;
-      if (ref) targetContainer.insertBefore(srcWrap, ref);
-      else targetContainer.appendChild(srcWrap);
+      // ── BELOW: insert bundle after the target's child block (if any) ──
+      const childBlock = treeGetChildBlock(el);
+      const insertAfter = childBlock || el;
+      insertAfter.insertAdjacentElement('afterend', srcBundle.firstChild);
+      // insertAdjacentElement doesn't work on fragments — do it manually
+      // (srcBundle is a fragment; we need the last node for "afterend")
+      // Re-approach: just grab nodes out of the fragment
     } else {
-      // DROP INTO — nest src inside target as indented child
-      let indent = el.nextSibling;
-      if (!indent || !indent.classList?.contains('tree-indent')) {
-        indent = document.createElement('div');
-        indent.className = 'tree-indent';
-        el.insertAdjacentElement('afterend', indent);
+      // ── INTO: nest src bundle inside target's child indent block ──
+      let childBlock = treeGetChildBlock(el);
+      if (!childBlock) {
+        childBlock = document.createElement('div');
+        childBlock.className = 'tree-indent';
+        el.insertAdjacentElement('afterend', childBlock);
       }
-      // Unwrap src from its indent if needed
-      if (srcContainer?.classList.contains('tree-indent') && srcContainer.children.length === 1) {
-        srcContainer.replaceWith(treeDragSrc);
-      }
-      indent.appendChild(treeDragSrc);
+      childBlock.appendChild(srcBundle);
     }
 
     const srcName = treeDragSrc.getAttribute('data-name') || 'item';
@@ -4283,6 +4282,35 @@ function initTreeItemDrag(el) {
     showToast(`Moved ${srcName}`, 'ok');
     addLog('info', `Tree: moved "${srcName}" → "${tgtName}"`);
   });
+}
+
+// ── TREE HELPERS ──────────────────────────────────────────
+
+// Returns the tree-indent div immediately after el (its direct children block), or null
+function treeGetChildBlock(el) {
+  const next = el.nextElementSibling;
+  if (next && next.classList.contains('tree-indent')) return next;
+  return null;
+}
+
+// Returns a DocumentFragment containing [el, childBlock?] so the whole subtree
+// can be moved as one unit without losing children
+function treeGetBundle(el) {
+  const frag = document.createDocumentFragment();
+  // If el itself is inside a tree-indent that ONLY contains el, pull both up
+  const parent = el.parentElement;
+  const childBlock = treeGetChildBlock(el);
+
+  frag.appendChild(el);
+  if (childBlock) frag.appendChild(childBlock);
+  return frag;
+}
+
+// Returns true if `target` is a descendant (inside the children) of `ancestor`
+function treeIsDescendantOf(target, ancestor) {
+  const childBlock = treeGetChildBlock(ancestor);
+  if (!childBlock) return false;
+  return childBlock.contains(target);
 }
 
 // Global dragover — move ghost + tilt
