@@ -2370,6 +2370,11 @@
         <div class="ctx-item" onclick="openMeasureTool()">
           <i class="fa-solid fa-ruler" style="color:var(--red)"></i> Measure Tool
         </div>
+        <div class="ctx-sep"></div>
+        <div class="ctx-item" onclick="open3DItemBuilder()">
+          <i class="fa-solid fa-cube" style="color:var(--accent2)"></i> 3D Item Builder
+          <span style="background:var(--accent2);color:#fff;border-radius:3px;padding:1px 5px;font-size:9px;margin-left:auto">NEW</span>
+        </div>
       </div>
             <div id="files-dropdown"
         style="display:none;position:absolute;top:36px;left:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:4px;box-shadow:0 8px 32px rgba(0,0,0,0.5);z-index:600;min-width:200px;">
@@ -6081,6 +6086,830 @@ document.head.appendChild(ipadStyle);
       </div>
     </div>
   </div>
+
+  <!-- 3D ITEM BUILDER MODAL -->
+  <div class="modal-backdrop" id="item3d-modal" style="z-index:1300;padding:0">
+    <div class="modal"
+      style="width:100vw;height:100vh;max-height:100vh;display:flex;flex-direction:column;padding:0;overflow:hidden;border-radius:0;border:none">
+      <!-- Header -->
+      <div
+        style="padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;background:var(--bg1)">
+        <i class="fa-solid fa-cube" style="color:var(--accent2)"></i>
+        <span style="font-size:14px;font-weight:700;font-family:'Unbounded',sans-serif;background:linear-gradient(90deg,var(--text0),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">3D Item Builder</span>
+        <span style="font-size:11px;color:var(--text2);font-weight:400">— build custom Roblox tool models</span>
+        <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+          <button onclick="item3dCopyCommand()" style="height:28px;padding:0 14px;background:var(--green);border:none;border-radius:5px;color:#0a1a10;font-size:11px;font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px"><i class="fa-solid fa-copy"></i> Copy Command</button>
+          <button onclick="closeModal('item3d-modal')" style="height:28px;width:28px;background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--text2);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+      <!-- Body -->
+      <div style="display:flex;flex:1;overflow:hidden;min-height:0">
+
+        <!-- LEFT: Parts palette + properties -->
+        <div
+          style="width:230px;min-width:200px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto">
+          <!-- Mode tabs -->
+          <div style="display:flex;border-bottom:1px solid var(--border);flex-shrink:0">
+            <button id="i3d-tab-parts" onclick="i3dSwitchTab('parts')" style="flex:1;height:32px;background:var(--bg3);border:none;border-bottom:2px solid var(--accent2);color:var(--text0);font-size:11px;font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer">Parts</button>
+            <button id="i3d-tab-code" onclick="i3dSwitchTab('code')" style="flex:1;height:32px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text2);font-size:11px;font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer">Code</button>
+            <button id="i3d-tab-props" onclick="i3dSwitchTab('props')" style="flex:1;height:32px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text2);font-size:11px;font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer">Props</button>
+          </div>
+
+          <!-- Parts pane -->
+          <div id="i3d-pane-parts" style="padding:10px;display:flex;flex-direction:column;gap:6px">
+            <div
+              style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">
+              Add Part</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+              <button onclick="i3dAddPart('Block')" style="height:34px;background:var(--bg4);border:1px solid var(--border);border-radius:5px;color:var(--text1);font-size:11px;font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer;transition:all .12s" onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'" onmouseout="this.style.borderColor='';this.style.color=''"><i class="fa-solid fa-square"></i> Block</button>
+              <button onclick="i3dAddPart('Wedge')" style="height:34px;background:var(--bg4);border:1px solid var(--border);border-radius:5px;color:var(--text1);font-size:11px;font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer;transition:all .12s" onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'" onmouseout="this.style.borderColor='';this.style.color=''"><i class="fa-solid fa-play"></i> Wedge</button>
+              <button onclick="i3dAddPart('Cylinder')" style="height:34px;background:var(--bg4);border:1px solid var(--border);border-radius:5px;color:var(--text1);font-size:11px;font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer;transition:all .12s" onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'" onmouseout="this.style.borderColor='';this.style.color=''"><i class="fa-solid fa-circle"></i> Cyl</button>
+              <button onclick="i3dAddPart('Sphere')" style="height:34px;background:var(--bg4);border:1px solid var(--border);border-radius:5px;color:var(--text1);font-size:11px;font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer;transition:all .12s" onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'" onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'" onmouseout="this.style.borderColor='';this.style.color=''"><i class="fa-solid fa-circle-dot"></i> Sphere</button>
+            </div>
+            <div
+              style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-top:8px;margin-bottom:2px">
+              Parts List</div>
+            <div id="i3d-parts-list"
+              style="display:flex;flex-direction:column;gap:3px;max-height:220px;overflow-y:auto"></div>
+            <div
+              style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-top:8px;margin-bottom:4px">
+              Selected Part</div>
+            <div id="i3d-selected-props"
+              style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:11px;color:var(--text2);text-align:center">No part selected</div>
+            </div>
+          </div>
+
+          <!-- Code pane -->
+          <div id="i3d-pane-code" style="padding:10px;display:none;flex-direction:column;gap:6px">
+            <div
+              style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">
+              Tool Script</div>
+            <textarea id="i3d-tool-script" style="width:100%;height:240px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text0);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;padding:8px;resize:vertical;outline:none" placeholder="-- Tool script (LocalScript)&#10;local tool = script.Parent&#10;tool.Activated:Connect(function()&#10;    print('Tool used!')&#10;end)"></textarea>
+            <div
+              style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-top:4px;margin-bottom:2px">
+              Item Settings</div>
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:11px;color:var(--text2);width:70px">Name</span>
+                <input id="i3d-item-name" type="text" value="MyTool" style="flex:1;height:26px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text0);font-size:11px;font-family:'JetBrains Mono',monospace;padding:0 6px;outline:none">
+              </div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:11px;color:var(--text2);width:70px">Grip</span>
+                <select id="i3d-grip" style="flex:1;height:26px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text0);font-size:11px;padding:0 4px;outline:none">
+                  <option>Right Hand</option><option>Left Hand</option><option>None</option>
+                </select>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:11px;color:var(--text2);width:70px">Can Drop</span>
+                <select id="i3d-candrop" style="flex:1;height:26px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text0);font-size:11px;padding:0 4px;outline:none">
+                  <option value="true">Yes</option><option value="false">No</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Props pane -->
+          <div id="i3d-pane-props" style="padding:10px;display:none;flex-direction:column;gap:6px">
+            <div
+              style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">
+              Camera</div>
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:11px;color:var(--text2);width:60px">Zoom</span>
+                <input type="range" id="i3d-cam-zoom" min="40" max="200" value="90" oninput="i3dUpdateCamera()" style="flex:1">
+                <span id="i3d-cam-zoom-val" style="font-size:10px;color:var(--text1);width:30px;text-align:right">90</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:11px;color:var(--text2);width:60px">Tilt</span>
+                <input type="range" id="i3d-cam-tilt" min="-60" max="60" value="25" oninput="i3dUpdateCamera()" style="flex:1">
+                <span id="i3d-cam-tilt-val" style="font-size:10px;color:var(--text1);width:30px;text-align:right">25°</span>
+              </div>
+            </div>
+            <div
+              style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-top:8px;margin-bottom:4px">
+              View</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+              <button onclick="i3dSetView('front')" style="height:28px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text1);font-size:10px;font-family:'Space Grotesk',sans-serif;cursor:pointer">Front</button>
+              <button onclick="i3dSetView('side')" style="height:28px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text1);font-size:10px;font-family:'Space Grotesk',sans-serif;cursor:pointer">Side</button>
+              <button onclick="i3dSetView('top')" style="height:28px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text1);font-size:10px;font-family:'Space Grotesk',sans-serif;cursor:pointer">Top</button>
+              <button onclick="i3dSetView('iso')" style="height:28px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text1);font-size:10px;font-family:'Space Grotesk',sans-serif;cursor:pointer">Iso</button>
+            </div>
+            <div
+              style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-top:8px;margin-bottom:4px">
+              Grid</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:11px;color:var(--text2);width:60px">Snap</span>
+              <input type="range" id="i3d-snap-size" min="0.25" max="4" step="0.25" value="1" oninput="i3dUpdateSnap()" style="flex:1">
+              <span id="i3d-snap-val" style="font-size:10px;color:var(--text1);width:36px;text-align:right">1 st</span>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:4px">
+              <button id="i3d-grid-btn" onclick="i3dToggleGrid()" style="flex:1;height:28px;background:var(--accent-glow);border:1px solid var(--accent);color:var(--accent);font-size:10px;font-family:'Space Grotesk',sans-serif;font-weight:700;border-radius:4px;cursor:pointer">Grid ON</button>
+              <button onclick="i3dResetCamera()" style="flex:1;height:28px;background:var(--bg4);border:1px solid var(--border);color:var(--text1);font-size:10px;font-family:'Space Grotesk',sans-serif;font-weight:700;border-radius:4px;cursor:pointer">Reset Cam</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTER: 3D Canvas -->
+        <div style="flex:1;display:flex;flex-direction:column;background:var(--bg0);overflow:hidden;min-width:0">
+          <div
+            style="padding:6px 12px;background:var(--bg1);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap">
+            <span style="font-size:11px;color:var(--text2)"><i class="fa-solid fa-cube" style="color:var(--accent2);margin-right:4px"></i>3D Viewport</span>
+            <span style="font-size:10px;color:var(--text3)">Drag to rotate · Scroll to zoom · Right-drag to pan</span>
+            <div style="margin-left:auto;display:flex;gap:4px">
+              <button onclick="i3dAddPart('Block')" style="height:24px;padding:0 10px;background:var(--accent2);border:none;border-radius:4px;color:#fff;font-size:10px;font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer"><i class="fa-solid fa-plus"></i> Add Part</button>
+              <button onclick="i3dDeleteSelected()" style="height:24px;padding:0 8px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--red);font-size:10px;cursor:pointer" title="Delete"><i class="fa-solid fa-trash"></i></button>
+              <button onclick="i3dDuplicateSelected()" style="height:24px;padding:0 8px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text1);font-size:10px;cursor:pointer" title="Duplicate"><i class="fa-solid fa-copy"></i></button>
+            </div>
+          </div>
+          <div style="flex:1;position:relative;overflow:hidden" id="i3d-viewport-wrap">
+            <canvas id="i3d-canvas"
+              style="position:absolute;inset:0;width:100%;height:100%;cursor:grab;touch-action:none"></canvas>
+            <!-- Selection info overlay -->
+            <div id="i3d-sel-overlay"
+              style="display:none;position:absolute;top:8px;left:8px;background:rgba(13,15,20,0.88);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text1);pointer-events:none;backdrop-filter:blur(8px)">
+            </div>
+            <!-- Axis labels -->
+            <div style="position:absolute;bottom:8px;left:8px;display:flex;gap:6px;pointer-events:none">
+              <span style="font-size:10px;color:var(--red);font-weight:700;font-family:'JetBrains Mono',monospace">X</span>
+              <span style="font-size:10px;color:var(--green);font-weight:700;font-family:'JetBrains Mono',monospace">Y</span>
+              <span style="font-size:10px;color:#4fc3f7;font-weight:700;font-family:'JetBrains Mono',monospace">Z</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Output command -->
+        <div
+          style="width:240px;min-width:200px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden">
+          <div style="padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
+            <div
+              style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">
+              Output Command</div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:6px;line-height:1.5">Paste into Roblox Studio
+              <strong>Command Bar</strong> to create this tool in
+              <code style="background:var(--bg3);padding:1px 4px;border-radius:3px">Workspace</code>.</div>
+            <button onclick="i3dCopyCommand()" style="width:100%;height:30px;background:var(--green);border:none;border-radius:5px;color:#0a1a10;font-size:11px;font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px"><i class="fa-solid fa-copy"></i> Copy Command</button>
+          </div>
+          <div id="i3d-output-code"
+            style="flex:1;overflow-y:auto;padding:10px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent3);line-height:1.6;white-space:pre-wrap;word-break:break-all;background:var(--bg1);cursor:pointer"
+            onclick="i3dCopyCommand()" title="Click to copy"></div>
+          <div style="padding:8px 12px;border-top:1px solid var(--border);flex-shrink:0">
+            <div
+              style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">
+              Send to Editor</div>
+            <button onclick="i3dSendToEditor()" style="width:100%;height:30px;background:var(--accent);border:none;border-radius:5px;color:#fff;font-size:11px;font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer"><i class="fa-solid fa-code"></i> Insert Tool Script</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom bar -->
+      <div
+        style="padding:8px 18px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--bg1);flex-shrink:0;flex-wrap:wrap">
+        <span id="i3d-status" style="font-size:11px;color:var(--text2);flex:1">Ready — add parts to build your tool model</span>
+        <span id="i3d-part-count" style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace">0 parts</span>
+        <button onclick="i3dClearAll()" style="height:28px;padding:0 12px;background:var(--bg4);border:1px solid var(--border);border-radius:5px;color:var(--red);font-size:11px;font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer">Clear All</button>
+        <button onclick="closeModal('item3d-modal')" style="height:28px;padding:0 14px;background:var(--accent);border:none;border-radius:5px;color:#fff;font-size:11px;font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════
+  // 3D ITEM BUILDER
+  // ═══════════════════════════════════════════════════════
+  (function() {
+    // ── State ──
+    const STATE = {
+      parts: [],          // [{id, type, x,y,z, sx,sy,sz, rx,ry,rz, color, name, anchor}]
+      selectedId: null,
+      camYaw: 0.6,
+      camPitch: 0.4,
+      camDist: 8,
+      camPanX: 0,
+      camPanY: 0,
+      gridOn: true,
+      snapSize: 1,
+      partCounter: 0,
+      drag: null,         // {mode:'rotate'|'pan'|'select', startX, startY, ...}
+      mouse3d: null,
+    };
+
+    // ── Canvas setup ──
+    let canvas, ctx, W, H;
+    let animReq = null;
+
+    function initCanvas() {
+      canvas = document.getElementById('i3d-canvas');
+      if (!canvas) return;
+      ctx = canvas.getContext('2d');
+      resizeCanvas();
+      canvas.addEventListener('mousedown', onMouseDown);
+      canvas.addEventListener('mousemove', onMouseMove);
+      canvas.addEventListener('mouseup', onMouseUp);
+      canvas.addEventListener('mouseleave', onMouseUp);
+      canvas.addEventListener('wheel', onWheel, { passive: false });
+      canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+      canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+      canvas.addEventListener('touchend', onTouchEnd);
+      canvas.addEventListener('contextmenu', e => e.preventDefault());
+      window.addEventListener('resize', () => { if (document.getElementById('item3d-modal').classList.contains('open')) resizeCanvas(); });
+      render();
+    }
+
+    function resizeCanvas() {
+      if (!canvas) return;
+      const wrap = document.getElementById('i3d-viewport-wrap');
+      if (!wrap) return;
+      W = canvas.width = wrap.offsetWidth;
+      H = canvas.height = wrap.offsetHeight;
+    }
+
+    // ── Projection ──
+    function project(x, y, z) {
+      // Rotate around Y (yaw) then X (pitch)
+      const cy = Math.cos(STATE.camYaw), sy = Math.sin(STATE.camYaw);
+      const cx = Math.cos(-STATE.camPitch), sx = Math.sin(-STATE.camPitch);
+      // Yaw
+      const rx = x * cy + z * sy;
+      const ry = y;
+      const rz = -x * sy + z * cy;
+      // Pitch
+      const px = rx;
+      const py = ry * cx - rz * sx;
+      const pz = ry * sx + rz * cx;
+      // Perspective
+      const fov = parseFloat(document.getElementById('i3d-cam-zoom')?.value || 90);
+      const f = (fov / 100) * Math.min(W, H) * 0.5;
+      const d = pz + STATE.camDist;
+      if (d <= 0.01) return null;
+      const sx2 = W / 2 + STATE.camPanX + px * f / d;
+      const sy2 = H / 2 + STATE.camPanY - py * f / d;
+      return { sx: sx2, sy: sy2, d: d };
+    }
+
+    // ── Draw helpers ──
+    function drawLine(ax,ay,az,bx,by,bz,color,width) {
+      const pa = project(ax,ay,az), pb = project(bx,by,bz);
+      if (!pa || !pb) return;
+      ctx.strokeStyle = color; ctx.lineWidth = width;
+      ctx.beginPath(); ctx.moveTo(pa.sx, pa.sy); ctx.lineTo(pb.sx, pb.sy); ctx.stroke();
+    }
+
+    function drawGrid() {
+      if (!STATE.gridOn) return;
+      const size = 8;
+      for (let i = -size; i <= size; i++) {
+        const a = Math.abs(i) === 0 ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)';
+        drawLine(i, 0, -size, i, 0, size, a, 1);
+        drawLine(-size, 0, i, size, 0, i, a, 1);
+      }
+      // Axis lines
+      drawLine(-size,0,0, size,0,0, 'rgba(240,93,106,0.5)', 1.5);
+      drawLine(0,0,-size, 0,0,size, 'rgba(79,195,247,0.5)', 1.5);
+    }
+
+    function hexToRgb(hex) {
+      const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+      return `${r},${g},${b}`;
+    }
+
+    // ── Part rendering ──
+    function getPartCorners(p) {
+      const hx = p.sx/2, hy = p.sy/2, hz = p.sz/2;
+      // 8 corners of box in local space (pre-rotation not implemented for simplicity — pure axis-aligned)
+      return [
+        [p.x-hx, p.y-hy, p.z-hz],
+        [p.x+hx, p.y-hy, p.z-hz],
+        [p.x+hx, p.y+hy, p.z-hz],
+        [p.x-hx, p.y+hy, p.z-hz],
+        [p.x-hx, p.y-hy, p.z+hz],
+        [p.x+hx, p.y-hy, p.z+hz],
+        [p.x+hx, p.y+hy, p.z+hz],
+        [p.x-hx, p.y+hy, p.z+hz],
+      ];
+    }
+
+    function drawPart(p, selected) {
+      const corners = getPartCorners(p);
+      const proj = corners.map(c => project(c[0], c[1], c[2]));
+      if (proj.some(pp => !pp)) return;
+
+      const rgb = hexToRgb(p.color);
+      const isAnchor = p.anchor;
+      const faces = [
+        [0,1,2,3],[4,5,6,7],[0,1,5,4],[3,2,6,7],[1,2,6,5],[0,3,7,4]
+      ];
+      // Sort faces by depth (painter's algorithm)
+      const facesWithDepth = faces.map(f => {
+        const avgD = f.reduce((s,i) => s + proj[i].d, 0) / f.length;
+        return { f, avgD };
+      }).sort((a,b) => b.avgD - a.avgD);
+
+      // Lighting per face
+      const lightDirs = [
+        [0,1,0],[0,-1,0],[1,0,0],[-1,0,0],[0,0,1],[0,0,-1]
+      ];
+      const lightMult = [0.95, 0.45, 0.75, 0.65, 0.85, 0.55];
+
+      facesWithDepth.forEach(({f, avgD}, fi) => {
+        const pts = f.map(i => proj[i]);
+        const light = lightMult[faces.indexOf(f)];
+        const alpha = selected ? 0.92 : 0.78;
+
+        ctx.beginPath();
+        ctx.moveTo(pts[0].sx, pts[0].sy);
+        for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].sx, pts[i].sy);
+        ctx.closePath();
+
+        if (p.type === 'Sphere') {
+          // Draw sphere as projected circle (approx)
+          const ctr = project(p.x, p.y, p.z);
+          if (!ctr) return;
+          const edge = project(p.x + p.sx/2, p.y, p.z);
+          if (!edge) return;
+          const r = Math.abs(edge.sx - ctr.sx);
+          ctx.beginPath();
+          ctx.arc(ctr.sx, ctr.sy, Math.max(r, 2), 0, Math.PI*2);
+          const grad = ctx.createRadialGradient(ctr.sx - r*0.3, ctr.sy - r*0.3, 0, ctr.sx, ctr.sy, r);
+          grad.addColorStop(0, `rgba(${rgb},${Math.min(alpha+0.15,1)})`);
+          grad.addColorStop(1, `rgba(${rgb},${alpha*0.4})`);
+          ctx.fillStyle = grad;
+          ctx.fill();
+          ctx.strokeStyle = selected ? 'rgba(124,106,245,0.9)' : `rgba(${rgb},0.5)`;
+          ctx.lineWidth = selected ? 2 : 1;
+          ctx.stroke();
+          if (isAnchor) { ctx.strokeStyle='rgba(240,193,77,0.9)'; ctx.lineWidth=2; ctx.stroke(); }
+          return;
+        }
+
+        const lv = Math.round(light * 255);
+        const rr = Math.min(255, Math.round(parseInt(p.color.slice(1,3),16) * light));
+        const rg = Math.min(255, Math.round(parseInt(p.color.slice(3,5),16) * light));
+        const rb = Math.min(255, Math.round(parseInt(p.color.slice(5,7),16) * light));
+        ctx.fillStyle = `rgba(${rr},${rg},${rb},${alpha})`;
+        ctx.fill();
+        ctx.strokeStyle = selected ? 'rgba(124,106,245,0.9)' : `rgba(${rgb},0.35)`;
+        ctx.lineWidth = selected ? 2 : 0.8;
+        ctx.stroke();
+        if (isAnchor) { ctx.strokeStyle='rgba(240,193,77,0.9)'; ctx.lineWidth=1.5; ctx.stroke(); }
+      });
+
+      // Part label
+      const ctr = project(p.x, p.y + p.sy/2 + 0.15, p.z);
+      if (ctr && selected) {
+        ctx.font = '10px Space Grotesk, sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.textAlign = 'center';
+        ctx.fillText(p.name, ctr.sx, ctr.sy);
+      }
+    }
+
+    // ── Render loop ──
+    function render() {
+      if (!canvas || !ctx) return;
+      ctx.clearRect(0, 0, W, H);
+
+      // Background gradient
+      const bg = ctx.createLinearGradient(0, 0, 0, H);
+      bg.addColorStop(0, '#0d0f14');
+      bg.addColorStop(1, '#080a0f');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, H);
+
+      drawGrid();
+
+      // Sort parts by depth
+      const sorted = [...STATE.parts].map(p => {
+        const c = project(p.x, p.y, p.z);
+        return { p, depth: c ? c.d : 9999 };
+      }).sort((a,b) => b.depth - a.depth);
+
+      sorted.forEach(({p}) => drawPart(p, p.id === STATE.selectedId));
+
+      // Axis cross in corner
+      drawAxisGizmo();
+
+      animReq = requestAnimationFrame(render);
+    }
+
+    function drawAxisGizmo() {
+      const ox = 40, oy = H - 40, len = 20;
+      const axes = [[1,0,0,'#f05d6a','X'],[0,1,0,'#4dc97e','Y'],[0,0,1,'#4fc3f7','Z']];
+      axes.forEach(([ax,ay,az,col,lbl]) => {
+        const from = project(ox/W*10-5, -(oy/H*10-5), 0);
+        // Simple axis in corner using separate small projection
+        const cy2 = Math.cos(STATE.camYaw), sy2 = Math.sin(STATE.camYaw);
+        const cx2 = Math.cos(-STATE.camPitch), sx2 = Math.sin(-STATE.camPitch);
+        function proj2(x,y,z) {
+          const rx = x*cy2+z*sy2; const ry = y; const rz = -x*sy2+z*cy2;
+          const px2 = rx; const py2 = ry*cx2-rz*sx2;
+          return { sx: ox+px2*len, sy: oy-py2*len };
+        }
+        const s = proj2(0,0,0), e = proj2(ax,ay,az);
+        ctx.strokeStyle = col; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(s.sx,s.sy); ctx.lineTo(e.sx,e.sy); ctx.stroke();
+        ctx.font = 'bold 9px Space Grotesk, sans-serif'; ctx.fillStyle = col; ctx.textAlign='center';
+        ctx.fillText(lbl, e.sx, e.sy-2);
+      });
+    }
+
+    // ── Input ──
+    let touch1 = null, touch2 = null;
+
+    function onMouseDown(e) {
+      e.preventDefault();
+      canvas.style.cursor = 'grabbing';
+      const mode = e.button === 2 ? 'pan' : 'rotate';
+      STATE.drag = { mode, startX: e.clientX, startY: e.clientY, startYaw: STATE.camYaw, startPitch: STATE.camPitch, startPanX: STATE.camPanX, startPanY: STATE.camPanY };
+      // Hit test on click (not drag)
+      if (e.button === 0) {
+        STATE.drag.potentialClick = true;
+        STATE.drag.clickX = e.clientX;
+        STATE.drag.clickY = e.clientY;
+      }
+    }
+
+    function onMouseMove(e) {
+      if (!STATE.drag) return;
+      const dx = e.clientX - STATE.drag.startX;
+      const dy = e.clientY - STATE.drag.startY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) STATE.drag.potentialClick = false;
+      if (STATE.drag.mode === 'rotate') {
+        STATE.camYaw = STATE.drag.startYaw + dx * 0.008;
+        STATE.camPitch = Math.max(-1.4, Math.min(1.4, STATE.drag.startPitch + dy * 0.008));
+      } else {
+        STATE.camPanX = STATE.drag.startPanX + dx;
+        STATE.camPanY = STATE.drag.startPanY + dy;
+      }
+    }
+
+    function onMouseUp(e) {
+      if (STATE.drag && STATE.drag.potentialClick && e.button === 0) {
+        hitTest(STATE.drag.clickX, STATE.drag.clickY);
+      }
+      STATE.drag = null;
+      canvas.style.cursor = 'grab';
+    }
+
+    function onWheel(e) {
+      e.preventDefault();
+      STATE.camDist = Math.max(2, Math.min(30, STATE.camDist + e.deltaY * 0.02));
+    }
+
+    function onTouchStart(e) {
+      e.preventDefault();
+      if (e.touches.length === 1) {
+        touch1 = e.touches[0];
+        STATE.drag = { mode: 'rotate', startX: touch1.clientX, startY: touch1.clientY, startYaw: STATE.camYaw, startPitch: STATE.camPitch, potentialClick: true, clickX: touch1.clientX, clickY: touch1.clientY };
+      } else if (e.touches.length === 2) {
+        touch1 = e.touches[0]; touch2 = e.touches[1];
+        STATE.drag = { mode: 'pinch', startDist: Math.hypot(touch2.clientX-touch1.clientX, touch2.clientY-touch1.clientY), startDist2: STATE.camDist };
+      }
+    }
+
+    function onTouchMove(e) {
+      e.preventDefault();
+      if (e.touches.length === 1 && STATE.drag && STATE.drag.mode === 'rotate') {
+        const t = e.touches[0];
+        const dx = t.clientX - STATE.drag.startX;
+        const dy = t.clientY - STATE.drag.startY;
+        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) STATE.drag.potentialClick = false;
+        STATE.camYaw = STATE.drag.startYaw + dx * 0.01;
+        STATE.camPitch = Math.max(-1.4, Math.min(1.4, STATE.drag.startPitch + dy * 0.01));
+      } else if (e.touches.length === 2 && STATE.drag && STATE.drag.mode === 'pinch') {
+        const d = Math.hypot(e.touches[1].clientX-e.touches[0].clientX, e.touches[1].clientY-e.touches[0].clientY);
+        STATE.camDist = Math.max(2, Math.min(30, STATE.drag.startDist2 * (STATE.drag.startDist / d)));
+      }
+    }
+
+    function onTouchEnd(e) {
+      if (STATE.drag && STATE.drag.potentialClick) hitTest(STATE.drag.clickX, STATE.drag.clickY);
+      STATE.drag = null; touch1 = null; touch2 = null;
+    }
+
+    // ── Hit testing ──
+    function hitTest(mx, my) {
+      const rect = canvas.getBoundingClientRect();
+      const cx = mx - rect.left, cy = my - rect.top;
+      let best = null, bestD = Infinity;
+      STATE.parts.forEach(p => {
+        const c = project(p.x, p.y, p.z);
+        if (!c) return;
+        const dx = c.sx - cx, dy = c.sy - cy;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const screenSize = Math.max(p.sx, p.sy, p.sz) * 20 / c.d;
+        if (dist < screenSize + 10 && c.d < bestD) { best = p; bestD = c.d; }
+      });
+      STATE.selectedId = best ? best.id : null;
+      updateSelOverlay();
+      updatePartsList();
+      if (best) showSelectedProps(best);
+    }
+
+    function updateSelOverlay() {
+      const el = document.getElementById('i3d-sel-overlay');
+      if (!el) return;
+      const p = STATE.parts.find(pp => pp.id === STATE.selectedId);
+      if (!p) { el.style.display = 'none'; return; }
+      el.style.display = 'block';
+      el.innerHTML = `<b style="color:var(--accent2)">${p.name}</b> [${p.type}]<br>Pos: ${p.x.toFixed(1)}, ${p.y.toFixed(1)}, ${p.z.toFixed(1)}<br>Size: ${p.sx.toFixed(1)}×${p.sy.toFixed(1)}×${p.sz.toFixed(1)}`;
+    }
+
+    // ── Part management ──
+    window.i3dAddPart = function(type) {
+      STATE.partCounter++;
+      const snap = STATE.snapSize;
+      const id = 'part_' + STATE.partCounter;
+      const colors = ['#5b8def','#7c6af5','#4dc97e','#f05d6a','#f0924d','#3dd6b5','#a97ef5'];
+      const color = colors[(STATE.partCounter - 1) % colors.length];
+      const p = {
+        id, type,
+        x: Math.round(0/snap)*snap, y: Math.round((STATE.partCounter-1)*1.2/snap)*snap, z: 0,
+        sx: type==='Sphere' ? 1 : type==='Cylinder' ? 1 : 2,
+        sy: type==='Sphere' ? 1 : type==='Cylinder' ? 2 : 1,
+        sz: type==='Sphere' ? 1 : type==='Cylinder' ? 1 : 1,
+        color,
+        name: type + STATE.partCounter,
+        anchor: STATE.parts.length === 0,
+        material: 'SmoothPlastic'
+      };
+      STATE.parts.push(p);
+      STATE.selectedId = id;
+      updatePartsList();
+      showSelectedProps(p);
+      updateSelOverlay();
+      updateOutputCode();
+      i3dStatus('Added ' + p.name);
+    };
+
+    window.i3dDeleteSelected = function() {
+      if (!STATE.selectedId) { i3dStatus('No part selected'); return; }
+      STATE.parts = STATE.parts.filter(p => p.id !== STATE.selectedId);
+      STATE.selectedId = null;
+      updatePartsList();
+      updateSelOverlay();
+      updateOutputCode();
+      document.getElementById('i3d-selected-props').innerHTML = '<div style="font-size:11px;color:var(--text2);text-align:center">No part selected</div>';
+      i3dStatus('Part deleted');
+    };
+
+    window.i3dDuplicateSelected = function() {
+      const src = STATE.parts.find(p => p.id === STATE.selectedId);
+      if (!src) { i3dStatus('No part selected'); return; }
+      STATE.partCounter++;
+      const np = { ...src, id: 'part_' + STATE.partCounter, name: src.name + '_Copy', x: src.x + 0.5, anchor: false };
+      STATE.parts.push(np);
+      STATE.selectedId = np.id;
+      updatePartsList();
+      showSelectedProps(np);
+      updateSelOverlay();
+      updateOutputCode();
+      i3dStatus('Duplicated: ' + np.name);
+    };
+
+    window.i3dClearAll = function() {
+      if (!confirm('Clear all parts?')) return;
+      STATE.parts = []; STATE.selectedId = null; STATE.partCounter = 0;
+      updatePartsList();
+      updateSelOverlay();
+      updateOutputCode();
+      document.getElementById('i3d-selected-props').innerHTML = '<div style="font-size:11px;color:var(--text2);text-align:center">No part selected</div>';
+      i3dStatus('Cleared all parts');
+    };
+
+    function updatePartsList() {
+      const list = document.getElementById('i3d-parts-list');
+      if (!list) return;
+      document.getElementById('i3d-part-count').textContent = STATE.parts.length + ' part' + (STATE.parts.length !== 1 ? 's' : '');
+      list.innerHTML = '';
+      STATE.parts.forEach(p => {
+        const row = document.createElement('div');
+        const sel = p.id === STATE.selectedId;
+        row.style.cssText = `display:flex;align-items:center;gap:6px;padding:5px 7px;background:${sel?'var(--accent-glow)':'var(--bg3)'};border:1px solid ${sel?'var(--accent2)':'var(--border)'};border-radius:5px;cursor:pointer;transition:all .1s`;
+        row.innerHTML = `<div style="width:10px;height:10px;border-radius:2px;background:${p.color};flex-shrink:0"></div><span style="flex:1;font-size:11px;color:${sel?'var(--accent2)':'var(--text1)'};font-family:'Space Grotesk',sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</span>${p.anchor?'<i class="fa-solid fa-anchor" style="color:var(--yellow);font-size:9px"></i>':''}`;
+        row.onclick = () => { STATE.selectedId = p.id; updatePartsList(); showSelectedProps(p); updateSelOverlay(); };
+        list.appendChild(row);
+      });
+    }
+
+    function showSelectedProps(p) {
+      const el = document.getElementById('i3d-selected-props');
+      if (!el) return;
+      el.innerHTML = `
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+          <div style="width:12px;height:12px;border-radius:2px;background:${p.color};flex-shrink:0"></div>
+          <input id="sp-name" value="${p.name}" style="flex:1;height:24px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text0);font-size:11px;font-family:'Space Grotesk',sans-serif;padding:0 6px;outline:none" oninput="i3dUpdateProp('name',this.value)">
+          <input id="sp-color" type="color" value="${p.color}" style="width:28px;height:24px;border:none;border-radius:4px;cursor:pointer;background:none;padding:0" oninput="i3dUpdateProp('color',this.value)">
+        </div>
+        <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:3px;align-items:center;font-size:10px;color:var(--text3);margin-bottom:2px">
+          <span></span><span style="text-align:center">X</span><span style="text-align:center">Y</span><span style="text-align:center">Z</span>
+        </div>
+        <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:3px;align-items:center;margin-bottom:4px">
+          <span style="font-size:10px;color:var(--text2)">Pos</span>
+          <input type="number" step="0.5" value="${p.x.toFixed(1)}" style="${inpStyle()}" oninput="i3dUpdateProp('x',parseFloat(this.value)||0)">
+          <input type="number" step="0.5" value="${p.y.toFixed(1)}" style="${inpStyle()}" oninput="i3dUpdateProp('y',parseFloat(this.value)||0)">
+          <input type="number" step="0.5" value="${p.z.toFixed(1)}" style="${inpStyle()}" oninput="i3dUpdateProp('z',parseFloat(this.value)||0)">
+        </div>
+        <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:3px;align-items:center;margin-bottom:6px">
+          <span style="font-size:10px;color:var(--text2)">Size</span>
+          <input type="number" step="0.5" min="0.1" value="${p.sx.toFixed(1)}" style="${inpStyle()}" oninput="i3dUpdateProp('sx',Math.max(0.1,parseFloat(this.value)||0.1))">
+          <input type="number" step="0.5" min="0.1" value="${p.sy.toFixed(1)}" style="${inpStyle()}" oninput="i3dUpdateProp('sy',Math.max(0.1,parseFloat(this.value)||0.1))">
+          <input type="number" step="0.5" min="0.1" value="${p.sz.toFixed(1)}" style="${inpStyle()}" oninput="i3dUpdateProp('sz',Math.max(0.1,parseFloat(this.value)||0.1))">
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">
+          <span style="font-size:10px;color:var(--text2);width:52px">Material</span>
+          <select id="sp-mat" style="flex:1;height:24px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text0);font-size:10px;outline:none" onchange="i3dUpdateProp('material',this.value)">
+            ${['SmoothPlastic','Neon','Metal','Wood','Brick','Fabric','Glass','Ice'].map(m=>`<option${p.material===m?' selected':''}>${m}</option>`).join('')}
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px">
+          <span style="font-size:10px;color:var(--text2);width:52px">Anchor</span>
+          <button onclick="i3dToggleAnchor('${p.id}')" style="flex:1;height:24px;background:${p.anchor?'var(--accent-glow)':'var(--bg4)'};border:1px solid ${p.anchor?'var(--accent2)':'var(--border)'};border-radius:4px;color:${p.anchor?'var(--accent2)':'var(--text2)'};font-size:10px;font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer">${p.anchor?'★ Handle':'Set as Handle'}</button>
+        </div>`;
+    }
+
+    function inpStyle() {
+      return 'width:100%;height:22px;background:var(--bg4);border:1px solid var(--border);border-radius:3px;color:var(--text0);font-size:10px;font-family:JetBrains Mono,monospace;padding:0 4px;outline:none;text-align:center';
+    }
+
+    window.i3dUpdateProp = function(key, val) {
+      const p = STATE.parts.find(pp => pp.id === STATE.selectedId);
+      if (!p) return;
+      p[key] = val;
+      updateSelOverlay();
+      updateOutputCode();
+      if (key === 'name') updatePartsList();
+    };
+
+    window.i3dToggleAnchor = function(id) {
+      const p = STATE.parts.find(pp => pp.id === id);
+      if (!p) return;
+      // Only one anchor (handle) at a time
+      STATE.parts.forEach(pp => pp.anchor = false);
+      p.anchor = true;
+      showSelectedProps(p);
+      updatePartsList();
+      updateOutputCode();
+      i3dStatus(p.name + ' set as tool handle');
+    };
+
+    // ── Camera controls ──
+    window.i3dUpdateCamera = function() {
+      const z = parseFloat(document.getElementById('i3d-cam-zoom').value);
+      const t = parseFloat(document.getElementById('i3d-cam-tilt').value);
+      document.getElementById('i3d-cam-zoom-val').textContent = z;
+      document.getElementById('i3d-cam-tilt-val').textContent = t + '°';
+      STATE.camPitch = t * Math.PI / 180;
+    };
+
+    window.i3dSetView = function(v) {
+      const views = { front:[0,0], side:[Math.PI/2,0], top:[0,Math.PI/2-0.01], iso:[0.6,0.4] };
+      const [yaw,pitch] = views[v] || [0,0];
+      STATE.camYaw = yaw; STATE.camPitch = pitch;
+      document.getElementById('i3d-cam-tilt').value = Math.round(pitch * 180 / Math.PI);
+      document.getElementById('i3d-cam-tilt-val').textContent = Math.round(pitch * 180 / Math.PI) + '°';
+    };
+
+    window.i3dResetCamera = function() {
+      STATE.camYaw = 0.6; STATE.camPitch = 0.4; STATE.camDist = 8; STATE.camPanX = 0; STATE.camPanY = 0;
+    };
+
+    window.i3dToggleGrid = function() {
+      STATE.gridOn = !STATE.gridOn;
+      const btn = document.getElementById('i3d-grid-btn');
+      if (btn) { btn.textContent = 'Grid ' + (STATE.gridOn ? 'ON' : 'OFF'); btn.style.background = STATE.gridOn ? 'var(--accent-glow)' : 'var(--bg4)'; btn.style.borderColor = STATE.gridOn ? 'var(--accent)' : 'var(--border)'; btn.style.color = STATE.gridOn ? 'var(--accent)' : 'var(--text1)'; }
+    };
+
+    window.i3dUpdateSnap = function() {
+      const v = parseFloat(document.getElementById('i3d-snap-size').value);
+      STATE.snapSize = v;
+      document.getElementById('i3d-snap-val').textContent = v + ' st';
+    };
+
+    // ── Tab switching ──
+    window.i3dSwitchTab = function(tab) {
+      ['parts','code','props'].forEach(t => {
+        const btn = document.getElementById('i3d-tab-'+t);
+        const pane = document.getElementById('i3d-pane-'+t);
+        const active = t === tab;
+        if (btn) { btn.style.background = active ? 'var(--bg3)' : 'transparent'; btn.style.borderBottomColor = active ? 'var(--accent2)' : 'transparent'; btn.style.color = active ? 'var(--text0)' : 'var(--text2)'; }
+        if (pane) pane.style.display = active ? 'flex' : 'none';
+      });
+    };
+
+    // ── Output command ──
+    function updateOutputCode() {
+      const el = document.getElementById('i3d-output-code');
+      if (!el) return;
+      const name = document.getElementById('i3d-item-name')?.value || 'MyTool';
+      const grip = document.getElementById('i3d-grip')?.value || 'Right Hand';
+      const canDrop = document.getElementById('i3d-candrop')?.value || 'true';
+      const toolScript = document.getElementById('i3d-tool-script')?.value || '';
+
+      let lines = [
+        `-- Generated by RblxUI Studio 3D Item Builder`,
+        `local tool = Instance.new("Tool")`,
+        `tool.Name = "${name}"`,
+        `tool.RequiresHandle = ${STATE.parts.some(p=>p.anchor)}`,
+        `tool.CanBeDropped = ${canDrop}`,
+        `tool.Parent = workspace`,
+        ``,
+      ];
+
+      STATE.parts.forEach(p => {
+        const shape = p.type === 'Sphere' ? 'Ball' : p.type === 'Cylinder' ? 'Cylinder' : p.type === 'Wedge' ? 'Wedge' : 'Block';
+        const r = parseInt(p.color.slice(1,3),16), g = parseInt(p.color.slice(3,5),16), b = parseInt(p.color.slice(5,7),16);
+        lines.push(`local ${p.name} = Instance.new("Part")`);
+        lines.push(`${p.name}.Name = "${p.name}"`);
+        lines.push(`${p.name}.Shape = Enum.PartType.${shape}`);
+        lines.push(`${p.name}.Size = Vector3.new(${p.sx.toFixed(2)}, ${p.sy.toFixed(2)}, ${p.sz.toFixed(2)})`);
+        lines.push(`${p.name}.CFrame = CFrame.new(${p.x.toFixed(2)}, ${p.y.toFixed(2)}, ${p.z.toFixed(2)})`);
+        lines.push(`${p.name}.BrickColor = BrickColor.new("${colorToBrick(p.color)}")`);
+        lines.push(`${p.name}.Material = Enum.Material.${p.material}`);
+        lines.push(`${p.name}.Anchored = false`);
+        if (p.anchor) lines.push(`${p.name}.Name = "Handle"`);
+        lines.push(`${p.name}.Parent = tool`);
+        lines.push(``)
+      });
+
+      if (toolScript.trim()) {
+        lines.push(`-- Tool Script`);
+        lines.push(`local ls = Instance.new("LocalScript")`);
+        lines.push(`ls.Source = [=[`);
+        lines.push(toolScript.trim());
+        lines.push(`]=]`);
+        lines.push(`ls.Parent = tool`);
+      }
+
+      el.textContent = lines.join('\n');
+    }
+
+    function colorToBrick(hex) {
+      // Map approximate to common BrickColors
+      const map = {'#5b8def':'Bright blue','#7c6af5':'Medium lavender','#4dc97e':'Bright green','#f05d6a':'Bright red','#f0924d':'Bright orange','#3dd6b5':'Teal','#a97ef5':'Lavender','#ffffff':'White','#000000':'Black'};
+      return map[hex.toLowerCase()] || 'Medium stone grey';
+    }
+
+    window.i3dCopyCommand = function() {
+      const el = document.getElementById('i3d-output-code');
+      if (!el) return;
+      navigator.clipboard.writeText(el.textContent).then(() => {
+        if (typeof showToast === 'function') showToast('Command copied!', 'ok');
+        i3dStatus('Command copied to clipboard!');
+      }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = el.textContent; document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+        if (typeof showToast === 'function') showToast('Command copied!', 'ok');
+      });
+    };
+
+    window.item3dCopyCommand = window.i3dCopyCommand;
+
+    window.i3dSendToEditor = function() {
+      const el = document.getElementById('i3d-output-code');
+      if (!el) return;
+      const editor = document.getElementById('code-editor');
+      if (!editor) return;
+      editor.value += '\n\n' + el.textContent;
+      if (typeof onCodeChange === 'function') onCodeChange();
+      if (typeof showToast === 'function') showToast('Tool script inserted into editor!', 'ok');
+      closeModal('item3d-modal');
+    };
+
+    function i3dStatus(msg) {
+      const el = document.getElementById('i3d-status');
+      if (el) el.textContent = msg;
+    }
+
+    // ── Open/Close ──
+    window.open3DItemBuilder = function() {
+      document.getElementById('tools-dropdown').style.display = 'none';
+      openModal('item3d-modal');
+      setTimeout(() => {
+        initCanvas();
+        updatePartsList();
+        updateOutputCode();
+        resizeCanvas();
+        i3dSwitchTab('parts');
+      }, 80);
+    };
+
+    // Listen for modal close to stop render loop
+    const _origClose = window.closeModal;
+    window.closeModal = function(id) {
+      if (id === 'item3d-modal' && animReq) { cancelAnimationFrame(animReq); animReq = null; }
+      if (_origClose) _origClose(id);
+      else document.getElementById(id).classList.remove('open');
+    };
+
+    // Live-update output when item settings change
+    document.addEventListener('input', function(e) {
+      if (['i3d-item-name','i3d-grip','i3d-candrop','i3d-tool-script'].includes(e.target.id)) updateOutputCode();
+    });
+
+  })();
+  </script>
 
   <!-- LAYER MANAGER MODAL -->
   <div class="modal-backdrop" id="layer-modal" style="z-index:1100">
